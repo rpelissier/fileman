@@ -1,0 +1,212 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        gradlePluginPortal()
+        maven { url "https://repo.spring.io/plugins-release" }
+    }
+    dependencies {
+        classpath "com.github.jk1:gradle-license-report:${licence_report_plugin_version}"
+        classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:${gradle_util_plugin_version}"
+        classpath "io.spring.gradle:dependency-management-plugin:${dependency_management_plugin_version}"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:${build_info_extractor_plugin_version}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
+        classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlin_version}"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:${ktlint_plugin_version}"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${detekt_version}"
+    }
+}
+
+plugins {
+    id "idea"
+    id "jacoco"
+    id "org.springframework.boot"
+    id "net.ltgt.apt-idea"
+    id "net.ltgt.apt"
+    id "com.google.cloud.tools.jib"
+    id "io.spring.nohttp"
+    id "org.sonarqube"
+    id "org.asciidoctor.convert"
+}
+
+group = "fr.dalae.fileman"
+version = "latest"
+
+assert System.properties["java.specification.version"] == "11" || "12" || "13"
+
+def profile = System.properties['spring.profiles.active']
+    ?: System.getenv('spring_profiles_active') ?: "prod"
+
+apply from: 'gradle/kotlin.gradle'
+apply from: 'gradle/jfrog.gradle'
+apply from: 'gradle/docker.gradle'
+apply from: 'gradle/jacoco.gradle'
+apply from: 'gradle/sonarcloud.gradle'
+
+if (project.hasProperty("prod") || profile == "prod") {
+    apply from: "gradle/profile_prod.gradle"
+} else {
+    apply from: "gradle/profile_dev.gradle"
+}
+
+defaultTasks "bootRun"
+
+springBoot {
+    mainClassName = "tech.metroscope.comment.CommentApplication"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+    test.kotlin.srcDirs += 'src/test/kotlin'
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+    if (!snippetsDir.exists()) {
+        snippetsDir.mkdirs()
+    }
+    javadocJsonDir = file("build/generated-javadoc-json")
+    reportsDir = file("build/reports")
+    contractsDir = file("mappings")
+    stubsOutputDirRoot = file("${project.buildDir}/libs/${project.getName()}-stubs/")
+}
+
+test {
+    useJUnitPlatform()
+    exclude "**/*IT*", "**/*IntTest*"
+
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+    // uncomment if the tests reports are not generated
+    // ignoreFailures true
+    reports.html.enabled = false
+
+    outputs.dir snippetsDir
+
+    systemProperty 'org.springframework.restdocs.outputDir', snippetsDir
+    systemProperty 'org.springframework.restdocs.javadocJsonDir', javadocJsonDir
+    systemProperty 'spring.profiles.active', 'test'
+}
+
+task integrationTest(type: Test) {
+    useJUnitPlatform()
+    description = "Execute integration tests."
+    group = "verification"
+    include "**/*IT*", "**/*IntTest*"
+
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+    reports.html.enabled = false
+}
+
+check.dependsOn integrationTest
+
+nohttp {
+    source.include "build.gradle", "README.md"
+}
+
+configurations {
+    providedRuntime
+    implementation.exclude module: "spring-boot-starter-tomcat"
+}
+
+apply plugin: 'com.github.jk1.dependency-license-report'
+apply plugin: 'com.github.ManifestClasspath'
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+    api "org.springframework.boot:spring-boot-starter-data-jpa"
+    api "org.springframework.boot:spring-boot-starter-actuator"
+    api "org.springframework.boot:spring-boot-starter-security"
+    api "org.springframework.boot:spring-boot-starter-web"
+    api "org.springframework.boot:spring-boot-starter-undertow"
+    api "org.springframework.boot:spring-boot-starter-validation"
+    api 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    api "com.fasterxml.jackson.module:jackson-module-kotlin"
+    api "org.jetbrains.kotlin:kotlin-reflect"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    api "org.codehaus.groovy:groovy:${groovy_version}"
+    api "com.vladmihalcea:hibernate-types-52:${hibernate_types}"
+
+    // Monitoring
+    api "io.micrometer:micrometer-registry-prometheus:latest.release"
+    api "io.micrometer:micrometer-core:latest.release"
+
+    // Web
+    api "com.github.kittinunf.fuel:fuel:${fuel_version}"
+    api "com.github.kittinunf.fuel:fuel-jackson:${fuel_version}"
+    runtimeOnly "org.apache.httpcomponents:httpclient:${httpclient_version}"
+
+    // Algorithm
+    api "org.bouncycastle:bcprov-jdk15on:${bouncycastle_version}"
+    api "org.bouncycastle:bcpkix-jdk15on:${bouncycastle_version}"
+
+    //Persistence
+    api "org.hibernate:hibernate-jcache:${hibernate_jcache_version}"
+    api "org.flywaydb:flyway-core:${flyway_version}"
+    api "org.postgresql:postgresql:${postgresql_version}"
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor") {
+        exclude group: "com.vaadin.external.google", module: "android-json"
+    }
+    annotationProcessor("org.projectlombok:lombok")
+
+    testRuntimeOnly "com.h2database:h2"
+    testRuntimeOnly "com.tngtech.archunit:archunit-junit5-engine:${archunit_junit5_version}"
+    testImplementation "com.ninja-squad:springmockk:${springmockk_version}"
+
+    testImplementation "com.metroscope:commons-core:${mts_commons_core}:tests"
+    testImplementation "com.tngtech.archunit:archunit-junit5-api:${archunit_junit5_version}"
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude module: "junit"
+        exclude module: "mockito-core"
+        exclude group: "com.vaadin.external.google", module: "android-json"
+    }
+
+    testImplementation "org.springframework.security:spring-security-test"
+    testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc"
+    testImplementation "org.springframework.restdocs:spring-restdocs-restassured"
+    testImplementation "org.springframework.restdocs:spring-restdocs-webtestclient"
+    testImplementation "io.rest-assured:rest-assured:${rest_assured_version}"
+    testImplementation "io.rest-assured:xml-path:${rest_assured_version}"
+    testImplementation "io.rest-assured:json-path:${rest_assured_version}"
+    testImplementation "io.rest-assured:spring-mock-mvc:${rest_assured_version}"
+    testImplementation "capital.scalable:spring-auto-restdocs-core:${spring_auto_restdocs_version}"
+}
+
+task cleanResources(type: Delete) {
+    delete "build/resources"
+}
+
+asciidoctor {
+    doFirst {
+        copy {
+            from 'src/docs/asciidoc'
+            into snippetsDir
+        }
+    }
+    resources {
+        from("$reportsDir/dependency-license") {
+            include "licenses.csv"
+        }
+    }
+    sourceDir snippetsDir
+    attributes 'snippets': snippetsDir, 'reports': reportsDir
+    dependsOn test, generateLicenseReport
+}
+
+checkstyle {
+    checkstyleTest.enabled = false
+}
+
+wrapper {
+    gradleVersion = "6.5"
+}
+
+compileJava.dependsOn processResources
+processResources.dependsOn bootBuildInfo

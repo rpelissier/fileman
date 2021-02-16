@@ -1,0 +1,18 @@
+/**
+ * plugins {
+ *      id "org.sonarqube" version "${sonarqube_plugin_version}"
+ * }
+ */
+
+sonarqube {
+    properties {
+        property "sonar.login", "$System.env.SONAR_TOKEN"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.organization", "metroscope-dev"
+        property "sonar.projectKey", "${sonarcloud_project_key}"
+        property "sonar.java.codeCoveragePlugin", "jacoco"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/codeCoverageReport/codeCoverageReport.xml"
+        property "sonar.kotlin.detekt.reportPaths", "${buildDir}/reports/detekt/detekt.xml"
+        property "sonar.exclusions", "**/tech/metroscope/comment/config/**"
+    }
+}

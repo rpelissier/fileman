@@ -1,0 +1,41 @@
+spring:
+    application:
+        name: Fileman
+    profiles:
+        # The commented value for `active` can be replaced with valid Spring profiles to load.
+        # Otherwise, it will be filled in by gradle when building the WAR file
+        # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
+        active: #spring.profiles.active#
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+            naming:
+                physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+                implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+            use-new-id-generator-mappings:properties: true
+            hibernate.cache.region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory  #this should not work without @Cache annotation
+            hibernate.cache.provider_class: org.ehcache.jsr107.EhcacheCachingProvider #same as above
+            hibernate.query.in_clause_parameter_padding: true
+            hibernate.connection.provider_disables_autocommit: true
+            hibernate.query.fail_on_pagination_over_collection_fetch: true
+    flyway:
+        locations: classpath:/db/postgresql
+        schemas: service_comment
+
+application:
+    paging:
+        default-page-size: 1000
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump']
+    endpoint:
+        health:
+            show-details: always
+        db:
+            enabled: false
+        messaging:
+            enabled: true

@@ -1,0 +1,41 @@
+logging:
+    level:
+        ROOT: DEBUG
+        fr.dalae: DEBUG
+        org.hibernate.SQL: debug
+        org.hibernate.type.descriptor.sql: debug
+
+spring:
+    profiles:
+        active: dev
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:postgresql://localhost:5432/fileman
+        username: fileman
+        password: fileman
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        database: POSTGRESQL
+        properties:
+            hibernate.id.new_generator_mappings: true
+            hibernate.cache.use_second_level_cache: true
+            hibernate.cache.use_query_cache: false
+            hibernate.generate_statistics: true
+            hibernate.default_schema: service_comment
+            hibernate.format_sql: true
+            hibernate.jdbc.batch_size: 20
+            hibernate.jdbc.order_inserts: true
+            hibernate.jdbc.batch_updates: true
+            hibernate.jdbc.batch_versioned_data: true
+    boot:
+        admin:
+            client:
+                enabled: false
+server:
+    port: 8088
+    servlet:
+        session:
+            cookie:
+                http-only: true
+
+application:

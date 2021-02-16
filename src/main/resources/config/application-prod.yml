@@ -1,0 +1,45 @@
+# ===================================================================
+# Spring Boot configuration for the "prod" profile.
+#
+# This configuration overrides the application.yml file.
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+logging:
+    level:
+        ROOT: ${LOG_LEVEL}
+        fr.dalae: ${LOG_LEVEL}
+    config: classpath:logback-spring.xml
+    file:
+        name: ${java.io.tmpdir}/spring.log
+
+spring:
+    profiles:
+        active: prod
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: ${DATASOURCE_URL}
+        username: ${DATASOURCE_USERNAME}
+        password: ${DATASOURCE_PASSWORD}
+    jackson:
+        serialization.indent_output: true
+    boot:
+        admin:
+            client:
+                enabled: false
+
+server:
+    port: ${PORT}
+
+# ===================================================================
+# Application specific properties
+# Add your own metroscope properties here, see the MetroscopeProperties class
+# to have type-safe configuration
+# ===================================================================
+
+application:
