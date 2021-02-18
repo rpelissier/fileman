@@ -1,14 +1,17 @@
 package fr.dalae.fileman.domain
 
 import javax.persistence.*
+import javax.validation.constraints.NotEmpty
 
 @Entity
-@Table(name = "origin", schema = "fileman")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 data class Origin(
-    val sourceId: String,
+    @ManyToOne(optional = false, cascade = [CascadeType.ALL])
+    val source: Source,
+
+    @NotEmpty
     val path: String,
 
-    @ManyToOne
+    @ManyToOne(optional = false, cascade = [CascadeType.ALL])
     val document: Document
 ) : BaseEntity()

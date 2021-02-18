@@ -2,6 +2,7 @@ package fr.dalae.fileman.repository
 
 import fr.dalae.fileman.domain.Document
 import fr.dalae.fileman.domain.Origin
+import fr.dalae.fileman.domain.Source
 import java.io.File
 import java.util.*
 import org.junit.jupiter.api.Test
@@ -21,7 +22,7 @@ class RepositoriesTest {
 
         val doc1 = Document(".txt", File("/ae439f10b"), Date(), 100)
 
-        val origin = Origin("Drive1", "/Volumes/HDD/renaud/test.txt", doc1)
+        val origin = Origin(Source("/Volumes/HDD1"), "renaud/test.txt", doc1)
 
         originRepository.save(origin)
     }
