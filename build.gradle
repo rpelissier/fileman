@@ -10,24 +10,19 @@ buildscript {
         classpath "com.github.jk1:gradle-license-report:${licence_report_plugin_version}"
         classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:${gradle_util_plugin_version}"
         classpath "io.spring.gradle:dependency-management-plugin:${dependency_management_plugin_version}"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:${build_info_extractor_plugin_version}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlin_version}"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:${ktlint_plugin_version}"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${detekt_version}"
     }
 }
 
 plugins {
     id "idea"
-    id "jacoco"
     id "org.springframework.boot"
     id "net.ltgt.apt-idea"
     id "net.ltgt.apt"
-    id "com.google.cloud.tools.jib"
     id "io.spring.nohttp"
-    id "org.sonarqube"
     id "org.asciidoctor.convert"
 }
 
@@ -40,10 +35,6 @@ def profile = System.properties['spring.profiles.active']
     ?: System.getenv('spring_profiles_active') ?: "prod"
 
 apply from: 'gradle/kotlin.gradle'
-apply from: 'gradle/jfrog.gradle'
-apply from: 'gradle/docker.gradle'
-apply from: 'gradle/jacoco.gradle'
-apply from: 'gradle/sonarcloud.gradle'
 
 if (project.hasProperty("prod") || profile == "prod") {
     apply from: "gradle/profile_prod.gradle"
@@ -54,7 +45,7 @@ if (project.hasProperty("prod") || profile == "prod") {
 defaultTasks "bootRun"
 
 springBoot {
-    mainClassName = "tech.metroscope.comment.CommentApplication"
+    mainClassName = "fr.dalae.fileman.FilemanApplication"
 }
 
 sourceSets {
@@ -90,20 +81,6 @@ test {
     systemProperty 'org.springframework.restdocs.javadocJsonDir', javadocJsonDir
     systemProperty 'spring.profiles.active', 'test'
 }
-
-task integrationTest(type: Test) {
-    useJUnitPlatform()
-    description = "Execute integration tests."
-    group = "verification"
-    include "**/*IT*", "**/*IntTest*"
-
-    testLogging {
-        events 'PASSED', 'FAILED', 'SKIPPED'
-    }
-    reports.html.enabled = false
-}
-
-check.dependsOn integrationTest
 
 nohttp {
     source.include "build.gradle", "README.md"
@@ -160,7 +137,6 @@ dependencies {
     testRuntimeOnly "com.tngtech.archunit:archunit-junit5-engine:${archunit_junit5_version}"
     testImplementation "com.ninja-squad:springmockk:${springmockk_version}"
 
-    testImplementation "com.metroscope:commons-core:${mts_commons_core}:tests"
     testImplementation "com.tngtech.archunit:archunit-junit5-api:${archunit_junit5_version}"
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude module: "junit"

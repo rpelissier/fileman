@@ -1,16 +1,12 @@
 package fr.dalae.fileman.domain
 
-import java.util.UUID
-import javax.persistence.Column
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
-import javax.persistence.Version
+import java.util.*
+import javax.persistence.*
 
 @MappedSuperclass
 abstract class BaseEntity {
     @Id
-    @Column(name = "id", length = 16, unique = true, nullable = false)
-    private val id: UUID = UUID.randomUUID()
+    var id: String = UUID.randomUUID().toString()
 
     @Version
     private val version: Long? = null

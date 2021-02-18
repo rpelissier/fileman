@@ -1,0 +1,13 @@
+spring:
+    profiles:
+        active: test
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        database: H2
+        show-sql: true
+        hibernate:
+            ddl-auto: create-drop
+
+server:
+    port: 8080
+    address: localhost

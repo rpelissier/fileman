@@ -7,7 +7,6 @@ apply plugin: "kotlin-allopen" // See https://kotlinlang.org/docs/reference/comp
 apply plugin: "kotlin-jpa"
 
 apply plugin: "org.jlleitschuh.gradle.ktlint"
-apply plugin: "io.gitlab.arturbosch.detekt"
 
 allOpen {
     annotation("javax.persistence.Entity")
@@ -33,21 +32,6 @@ dependencies {
 ktlint {
     //See more options: https://github.com/JLLeitschuh/ktlint-gradle#configuration
     ignoreFailures = true
-}
-
-detekt {
-    failFast = true
-    buildUponDefaultConfig = true
-    toolVersion = detekt_version
-    input = files("src/main/kotlin")
-    config = files("detekt-config.yml")
-
-    reports {
-        xml {
-            enabled = true
-            destination = file("$buildDir/reports/detekt/detekt.xml")
-        }
-    }
 }
 
 if (OperatingSystem.current().isWindows()) {

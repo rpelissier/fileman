@@ -26,20 +26,6 @@ spring:
         url: ${DATASOURCE_URL}
         username: ${DATASOURCE_USERNAME}
         password: ${DATASOURCE_PASSWORD}
-    jackson:
-        serialization.indent_output: true
-    boot:
-        admin:
-            client:
-                enabled: false
 
 server:
     port: ${PORT}
-
-# ===================================================================
-# Application specific properties
-# Add your own metroscope properties here, see the MetroscopeProperties class
-# to have type-safe configuration
-# ===================================================================
-
-application:

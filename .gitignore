@@ -1,11 +1,8 @@
-HELP.md
-target/
-.gradle
-gradle/wrapper
+build/
+.gradle/
+gradle/wrapper/
 gradlew
 gradlew.bat
-!**/src/main/**/target/
-!**/src/test/**/target/
 
 ### STS ###
 .apt_generated
