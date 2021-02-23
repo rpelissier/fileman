@@ -1,17 +1,38 @@
 package fr.dalae.fileman.domain
 
+import fr.dalae.fileman.FileUtils
+import java.io.File
+import java.io.Serializable
 import javax.persistence.*
-import javax.validation.constraints.NotEmpty
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@IdClass(OriginId::class)
 data class Origin(
-    @ManyToOne(optional = false, cascade = [CascadeType.ALL])
-    val source: Source,
-
-    @NotEmpty
-    val path: String,
+    @Id val rootPath: File,
+    @Id val relativePath: File,
 
     @ManyToOne(optional = false, cascade = [CascadeType.ALL])
     val document: Document
-) : BaseEntity()
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Origin) return false
+
+        if (rootPath != other.rootPath) return false
+        if (relativePath != other.relativePath) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = rootPath.hashCode()
+        result = 31 * result + relativePath.hashCode()
+        return result
+    }
+}
+
+// Composite key class must implement Serializable and have defaults.
+class OriginId(
+    val rootPath: File = FileUtils.UNKNOWN_FILE,
+    val relativePath: File = FileUtils.UNKNOWN_FILE
+) : Serializable

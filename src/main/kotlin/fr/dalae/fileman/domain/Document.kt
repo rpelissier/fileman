@@ -1,19 +1,31 @@
 package fr.dalae.fileman.domain
 
 import java.io.File
-import java.util.*
-import javax.persistence.*
-import javax.validation.constraints.NotEmpty
+import java.io.Serializable
+import javax.persistence.ElementCollection
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.IdClass
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@IdClass(DocumentId::class)
 data class Document(
-    val extension: String,
-    @NotEmpty
-    val path: File,
-    val lastModified: Date,
+    @Id
+    val name: String,
+    @Id
+    val lastModifiedEpochMs: Long,
+    @Id
     val size: Long,
 
-    @ManyToMany(cascade = [CascadeType.ALL])
-    val tags: Set<Tag> = mutableSetOf()
-) : BaseEntity()
+    val relativePath: File,
+    val extension: String,
+    @ElementCollection
+    val tags: Set<String> = mutableSetOf()
+)
+
+// Composite key class must implement Serializable and have defaults.
+class DocumentId(
+    val name: String = "",
+    val lastModifiedEpochMs: Long = 0L,
+    val size: Long = 0L
+) : Serializable
