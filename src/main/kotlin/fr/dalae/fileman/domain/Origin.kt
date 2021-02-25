@@ -9,13 +9,9 @@ import javax.persistence.*
 @IdClass(OriginId::class)
 data class Origin(
     @Id
-    @Convert(converter = FileConverter::class)
-    @Column(columnDefinition = "varchar(256)")
     val rootPath: File,
 
     @Id
-    @Convert(converter = FileConverter::class)
-    @Column(columnDefinition = "varchar(512)")
     val relativePath: File,
 
     @ManyToOne(optional = false, cascade = [CascadeType.ALL])
@@ -40,6 +36,10 @@ data class Origin(
 
 // Composite key class must implement Serializable and have defaults.
 data class OriginId(
+    @Convert(converter = FileConverter::class)
+    @Column(columnDefinition = "varchar(256)")
     val rootPath: File = FileUtils.UNKNOWN_FILE,
+    @Convert(converter = FileConverter::class)
+    @Column(columnDefinition = "varchar(512)")
     val relativePath: File = FileUtils.UNKNOWN_FILE
 ) : Serializable

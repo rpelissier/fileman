@@ -15,9 +15,9 @@ spring:
 
 logging:
   level:
-    org.hibernate: INFO #For stats
+    org.hibernate: INFO #Set to INFO for hibernate stats
     org.hibernate.SQL: INFO #Set to DEBUG to see individual SQL queries
-    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG #To see inserted values
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO # Set to TRACE to see SQL parameters
 
 server:
   port: 8080

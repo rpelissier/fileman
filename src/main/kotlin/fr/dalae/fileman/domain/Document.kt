@@ -20,7 +20,25 @@ data class Document(
     val extension: String,
     @ElementCollection
     val tags: Set<String> = mutableSetOf()
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Document) return false
+
+        if (name != other.name) return false
+        if (lastModifiedEpochMs != other.lastModifiedEpochMs) return false
+        if (size != other.size) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + lastModifiedEpochMs.hashCode()
+        result = 31 * result + size.hashCode()
+        return result
+    }
+}
 
 // Composite key class must implement Serializable and have defaults.
 data class DocumentId(
