@@ -13,6 +13,7 @@ class DirectoryLoaderTest {
 
     @Test
     fun test() {
-        directoryLoader.load(File("."))
+        directoryLoader.observer = CountingObserver.loggingObserver(500)
+        directoryLoader.load(File("/Users/renaud/DEV"))
     }
 }

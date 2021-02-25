@@ -14,6 +14,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlin_version}"
         classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlin_version}"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:${ktlint_plugin_version}"
+        classpath "io.freefair.gradle:lombok-plugin:5.3.0"
     }
 }
 
@@ -24,6 +25,7 @@ plugins {
     id "net.ltgt.apt"
     id "io.spring.nohttp"
     id "org.asciidoctor.convert"
+    id "io.freefair.lombok" version "5.3.0"
 }
 
 group = "fr.dalae.fileman"
@@ -131,7 +133,6 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor") {
         exclude group: "com.vaadin.external.google", module: "android-json"
     }
-    annotationProcessor("org.projectlombok:lombok")
 
     testRuntimeOnly "com.h2database:h2"
     testRuntimeOnly "com.tngtech.archunit:archunit-junit5-engine:${archunit_junit5_version}"

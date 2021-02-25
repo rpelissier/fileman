@@ -6,6 +6,6 @@ import java.util.*
 class FileUtils {
 
     companion object {
-        val UNKNOWN_FILE = File("unknown-"+ UUID.randomUUID())
+        val UNKNOWN_FILE = File("unknown-" + UUID.randomUUID())
     }
 }

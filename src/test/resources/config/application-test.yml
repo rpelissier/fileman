@@ -1,13 +1,24 @@
 spring:
-    profiles:
-        active: test
-    jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
-        database: H2
-        show-sql: true
-        hibernate:
-            ddl-auto: create-drop
+  profiles:
+    active: test
+  datasource:
+    url: "jdbc:h2:file:./build/test/h2"
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    database: H2
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        generate_statistics: true
+
+logging:
+  level:
+    org.hibernate: INFO #For stats
+    org.hibernate.SQL: INFO #Set to DEBUG to see individual SQL queries
+    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG #To see inserted values
 
 server:
-    port: 8080
-    address: localhost
+  port: 8080
+  address: localhost
