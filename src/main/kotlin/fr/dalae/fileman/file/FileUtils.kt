@@ -1,4 +1,4 @@
-package fr.dalae.fileman
+package fr.dalae.fileman.file
 
 import java.io.File
 import java.util.*

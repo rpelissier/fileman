@@ -3,16 +3,27 @@
 Fileman a pour but d'importer différentes sources de fichiers pour pouvoir
 les organiser, les sauvegarder, les partager et les indexer.
 L'utilisateur importe des nouvelles sources de données dans une répertoire de son choix.
-Ce répertoire est ajouté à Fileman qui va le scanner créer des hardlink sur les nouveaux fichiers (pour les importer)
-et créer des hardlink sur les doublons (pour effacer l'exemplaire inutile).
-L'interet en gardant le répertoire d'importation et de pouvoir recommencer des rsync depuis des sources remote
-pour importer des nouveaux fichiers de manière incrémentale.
+Ce répertoire est ajouté à Fileman qui va le scanner, indexer les fichiers, fusionner les doublons, 
+et ajouter les nouveaux fichiers en créant des hardlink.
+Le répertoire source n'est pas modifié et peut rester "vivant", par exemple en subissant des 
+updates par rsync de manière incrémentale.
 
+## Lot 1
+- Scanner un répertoire
+- L'indexer en BDD
+  - convertir les noeuds des paths en tags
+  - se souvenir du mapping avec le(s) documents d'origine
+  - merging par clé [name + date + size]
+- Hardlink des fichiers dans le stockage de référence local
+- Filtrer les fichiers importés
+  - Par extension
+  - Par path
+
+## Lot 2
 Features
 - supprimer les doublons
     - basés sur lastModified + size
     - ou sur un full hash (type md5)
-- convertir les noeuds des paths en tags
 - utiliser des hardlink pour l'importation du fichier et pour supprimer les doublons dans leur répertoire d'origine)
 - dedupliquer les doublons
 - merger les informations des doublons

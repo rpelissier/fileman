@@ -1,6 +1,6 @@
 package fr.dalae.fileman.domain
 
-import fr.dalae.fileman.FileUtils
+import fr.dalae.fileman.file.FileUtils
 import java.io.File
 import java.io.Serializable
 import javax.persistence.*

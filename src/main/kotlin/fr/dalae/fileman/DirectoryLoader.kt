@@ -8,7 +8,6 @@ import javax.transaction.Transactional
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.nio.file.Files
 
 @Service
 class DirectoryLoader(val batchSize: Int = 1000) {
@@ -24,8 +23,8 @@ class DirectoryLoader(val batchSize: Int = 1000) {
 
     @Transactional
     fun load(directory: File) {
-        //TODO use Files.walkFileTree() to avoid following symlink for
-        //both files and directories
+        // TODO use Files.walkFileTree() to avoid following symlink for
+        // both files and directories
         directory
             .walkTopDown()
             .filter { it != directory } // Do not return the directory itself
