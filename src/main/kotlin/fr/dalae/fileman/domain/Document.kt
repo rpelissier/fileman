@@ -2,6 +2,7 @@ package fr.dalae.fileman.domain
 
 import java.io.File
 import java.io.Serializable
+import java.nio.file.Path
 import javax.persistence.*
 
 @Entity
@@ -21,6 +22,13 @@ data class Document(
     @ElementCollection
     val tags: Set<String> = mutableSetOf()
 ) {
+    val id: DocumentId
+        get() = DocumentId(name, lastModifiedEpochMs, size)
+
+    fun resolveInto(storageDir: Path): Path {
+        return storageDir.resolve(relativePath.toPath())
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Document) return false

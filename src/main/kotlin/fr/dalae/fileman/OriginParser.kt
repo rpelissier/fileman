@@ -4,22 +4,20 @@ import fr.dalae.fileman.domain.Document
 import fr.dalae.fileman.domain.Origin
 import java.io.File
 
-class OriginParser {
+class OriginParser(val originDir: File) {
 
-    fun parse(rootDirectory: File, relativeFile: File): Origin {
-        if (relativeFile.isRooted) throw IllegalArgumentException("The path '$relativeFile' should be relative, not absolute.")
-
-        val doc = buildDoc(rootDirectory, relativeFile)
-        return Origin(rootDirectory, relativeFile, doc)
+    fun parse(relativeFile: File): Origin {
+        val doc = buildDoc(relativeFile)
+        return Origin(originDir, relativeFile, doc)
     }
 
-    private fun buildDoc(rootDirectory: File, relativeFile: File): Document {
-        val absFile = File(rootDirectory, relativeFile.path)
+    private fun buildDoc(relativeFile: File): Document {
+        val originAbsFile = File(originDir, relativeFile.path)
         val tags = buildTags(relativeFile)
         return Document(
             relativeFile.nameWithoutExtension,
-            absFile.lastModified(),
-            absFile.length(),
+            originAbsFile.lastModified(),
+            originAbsFile.length(),
             relativeFile,
             relativeFile.extension.toLowerCase(),
             tags

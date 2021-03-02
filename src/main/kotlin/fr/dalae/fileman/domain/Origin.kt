@@ -3,6 +3,7 @@ package fr.dalae.fileman.domain
 import fr.dalae.fileman.file.FileUtils
 import java.io.File
 import java.io.Serializable
+import java.nio.file.Path
 import javax.persistence.*
 
 @Entity
@@ -17,6 +18,16 @@ data class Origin(
     @ManyToOne(optional = false, cascade = [CascadeType.ALL])
     val document: Document
 ) {
+    init {
+        if (relativePath.isRooted) throw IllegalArgumentException("The path '$relativePath' should be relative, not absolute.")
+    }
+
+    val id: OriginId
+        get() = OriginId(rootPath, relativePath)
+
+    val absPath: Path
+        get() = File(rootPath, relativePath.path).toPath()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Origin) return false

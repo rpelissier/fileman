@@ -12,4 +12,7 @@ spring:
                 jdbc:
                     batch_size: 50
                     order_inserts: true
+application:
+    storagePath : "./build/test/storage"
+    batchSize: 1000
 

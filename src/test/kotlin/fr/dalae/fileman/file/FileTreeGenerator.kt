@@ -27,6 +27,9 @@ class FileTreeGenerator {
 
     private fun createFile(fd: FileDescriptor) {
         val file = fd.path.toFile()
+        if (fd.path.parent != null) {
+            fd.path.parent.toFile().mkdirs()
+        }
         RandomAccessFile(file, "rw").use {
             it.setLength(fd.size)
         }

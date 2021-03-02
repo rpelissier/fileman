@@ -13,6 +13,6 @@ class DirectoryLoaderTest {
 
     @Test
     fun test() {
-        directoryLoader.load(File("/Users/renaud/"))
+        directoryLoader.load(File("/Users/renaud/DEV/mts-filters"))
     }
 }

@@ -13,7 +13,7 @@ class FileWalkerTest {
     fun before() {
         val files = listOf(
             FileDescriptor("test.txt", "2015-02-20T06:30:00.000", 2.5.MB()),
-            FileDescriptor("test2.txt", "2016-02-20T06:30:00.000", 7.KB())
+            FileDescriptor("toto/test2.txt", "2016-02-20T06:30:00.000", 7.KB())
         )
         FileTreeGenerator().generate(rootPath, files.stream())
     }

@@ -7,7 +7,7 @@ import javax.persistence.Converter
 @Converter(autoApply = true)
 class FileConverter : AttributeConverter<File, String> {
     override fun convertToDatabaseColumn(attribute: File?): String {
-        return attribute?.path ?: ""
+        return attribute?.toString() ?: ""
     }
 
     override fun convertToEntityAttribute(dbData: String?): File {

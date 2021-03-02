@@ -11,14 +11,14 @@ class OriginParserTest {
 
     @Test
     fun test() {
-        val originParser = OriginParser()
-        val rootDirectory = File("/Users/renaud/Downloads")
-        val rootPath = Path.of(rootDirectory.path)
-        rootDirectory.walkTopDown().filter { it != rootDirectory }.forEach {
+        val originDir = File("/Users/renaud/Downloads")
+        val originParser = OriginParser(originDir)
+        val rootPath = Path.of(originDir.path)
+        originDir.walkTopDown().filter { it != originDir }.forEach {
             val path = Path.of(it.path)
             val relativePath = rootPath.relativize(path)
             // log.info(relativePath.toString())
-            log.info(originParser.parse(rootDirectory, relativePath.toFile()).toString())
+            log.info(originParser.parse(relativePath.toFile()).toString())
         }
     }
 }
