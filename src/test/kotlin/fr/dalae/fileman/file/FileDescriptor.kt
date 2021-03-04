@@ -14,5 +14,5 @@ data class FileDescriptor(val path: Path, val date: LocalDateTime, val size: Lon
     }
 
     val epochMillis: Long
-        get() = FileDate.toEpochMillis(date)
+        get() = FileDateUtils.toEpochMillis(date)
 }

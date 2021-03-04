@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class DirectoryLoader(applicationProperties: ApplicationProperties) {
+class DirectoryLoader(config: ApplicationProperties) {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -24,11 +24,13 @@ class DirectoryLoader(applicationProperties: ApplicationProperties) {
     @Autowired
     lateinit var documentRepository: DocumentRepository
 
-    private val storageDir = Path.of(applicationProperties.storagePath)
+    private val storageDir = Path.of(config.storagePath)
         .apply { toFile().mkdirs() }
 
-    val batchSize = applicationProperties.batchSize
+    val batchSize = config.batchSize
     var observer = CountingObserver.loggingObserver(batchSize)
+
+
 
     @Transactional
     fun load(originDir: File) {
@@ -37,6 +39,9 @@ class DirectoryLoader(applicationProperties: ApplicationProperties) {
         val originParser = OriginParser(originDir)
         originDir
             .walkTopDown()
+            .onEnter {
+                it.isFile || (it.isDirectory && !Files.isSymbolicLink(it.toPath()))
+            }
             .filter { it.isFile } // Do not return the directory itself
             .map { it.relativeTo(originDir) }
             .map { originParser.parse(it) }

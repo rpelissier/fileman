@@ -10,4 +10,8 @@ import org.springframework.validation.annotation.Validated
 @Validated
 @ConstructorBinding
 @ConfigurationProperties("application")
-data class ApplicationProperties(val storagePath: String, val batchSize: Int)
+data class ApplicationProperties(
+    val storagePath: String,
+    val batchSize: Int,
+    val followSymbolicLink: Boolean = false
+)
