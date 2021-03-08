@@ -1,12 +1,13 @@
 package fr.dalae.fileman.file
 
 import java.io.RandomAccessFile
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Stream
 
 class FileTreeGenerator {
     companion object {
-        val MAX_SIZE = 10 * 1024 * 1024L
+        const val MAX_SIZE = 10 * 1024 * 1024L
     }
 
     fun generate(root: Path, files: Stream<FileDescriptor>) {
@@ -17,9 +18,10 @@ class FileTreeGenerator {
             if (it.size > MAX_SIZE) throw IllegalArgumentException(
                 "Cannot generate '$it'. Only files smaller than $MAX_SIZE bytes are allowed. ")
             true
-        }.map {
+        }.map { it ->
             val absPath = root.resolve(it.path)
-            it.copy(path = absPath)
+            val absSymbolicLink = it.symbolicLinkTarget?.let { root.resolve(it) }
+            it.copy(path = absPath, symbolicLinkTarget = absSymbolicLink)
         }.forEach {
             createFile(it)
         }
@@ -30,9 +32,13 @@ class FileTreeGenerator {
         if (fd.path.parent != null) {
             fd.path.parent.toFile().mkdirs()
         }
-        RandomAccessFile(file, "rw").use {
-            it.setLength(fd.size)
+        if (fd.symbolicLinkTarget != null) {
+            Files.createSymbolicLink(fd.path, fd.symbolicLinkTarget.toAbsolutePath())
+        } else {
+            RandomAccessFile(file, "rw").use {
+                it.setLength(fd.size)
+            }
+            file.setLastModified(fd.epochMillis)
         }
-        file.setLastModified(fd.epochMillis)
     }
 }

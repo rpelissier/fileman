@@ -30,8 +30,6 @@ class DirectoryLoader(config: ApplicationProperties) {
     val batchSize = config.batchSize
     var observer = CountingObserver.loggingObserver(batchSize)
 
-
-
     @Transactional
     fun load(originDir: File) {
         // TODO use Files.walkFileTree() to avoid following symlink for
@@ -40,7 +38,8 @@ class DirectoryLoader(config: ApplicationProperties) {
         originDir
             .walkTopDown()
             .onEnter {
-                it.isFile || (it.isDirectory && !Files.isSymbolicLink(it.toPath()))
+                log.info("Entering '${it.path}'.")
+                !Files.isSymbolicLink(it.toPath())
             }
             .filter { it.isFile } // Do not return the directory itself
             .map { it.relativeTo(originDir) }

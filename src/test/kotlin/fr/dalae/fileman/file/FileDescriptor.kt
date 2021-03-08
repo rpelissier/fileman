@@ -4,9 +4,19 @@ import java.nio.file.Path
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-data class FileDescriptor(val path: Path, val date: LocalDateTime, val size: Long) {
+data class FileDescriptor(
+    val path: Path,
+    val date: LocalDateTime = LocalDateTime.now(),
+    val size: Long = 0L,
+    val symbolicLinkTarget: Path? = null
+) {
     constructor(path: String, date: String, size: Long) :
-            this(Path.of(path), LocalDateTime.parse(date, DATE_TIME_FORMATTER), size)
+            this(Path.of(path),
+                LocalDateTime.parse(date, DATE_TIME_FORMATTER),
+                size)
+
+    constructor(path: String, symbolicLinkTarget: String) :
+            this(Path.of(path), symbolicLinkTarget = Path.of(symbolicLinkTarget))
 
     companion object {
         val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS"
