@@ -1,11 +1,15 @@
 package fr.dalae.fileman
 
+import fr.dalae.fileman.domain.SourceDir
 import java.io.File
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import java.nio.file.Path
 
 @SpringBootTest
+@ActiveProfiles("test")
 class DirectoryLoaderTest {
 
     @Autowired
@@ -13,6 +17,11 @@ class DirectoryLoaderTest {
 
     @Test
     fun test() {
-        directoryLoader.load(File("/Users/renaud/DEV/mts-filters"))
+        directoryLoader.storageDir.toFile().apply {
+            deleteRecursively()
+            mkdirs()
+        }
+        val sourceDir = SourceDir(Path.of("/Users/renaud/DEV/mts-filters"))
+        directoryLoader.load(sourceDir)
     }
 }

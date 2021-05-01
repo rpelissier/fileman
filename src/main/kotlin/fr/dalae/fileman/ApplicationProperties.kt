@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.validation.annotation.Validated
 
 /**
- * Properties are configured in the `application.yml` file.
+ * Properties are configured in the `application-prod.yml` file.
  */
 @Validated
 @ConstructorBinding

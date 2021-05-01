@@ -1,8 +1,8 @@
 spring:
-  profiles:
-    active: test
   datasource:
     url: "jdbc:h2:file:./build/test/h2"
+    username: sa
+    password:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     database: H2
@@ -13,12 +13,14 @@ spring:
         format_sql: true
         generate_statistics: true
 
+application:
+  storagePath: "./build/test/storage"
+  batchSize: 1000
+
 logging:
   level:
-    org.hibernate: INFO #Set to INFO for hibernate stats
-    org.hibernate.SQL: INFO #Set to DEBUG to see individual SQL queries
+    ROOT: DEBUG
+    fr.dalae: DEBUG
+    org.hibernate: WARN #Set to INFO for hibernate stats
+    org.hibernate.SQL: DEBUG #Set to DEBUG to see individual SQL queries
     org.hibernate.type.descriptor.sql.BasicBinder: INFO # Set to TRACE to see SQL parameters
-
-server:
-  port: 8080
-  address: localhost

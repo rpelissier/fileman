@@ -1,8 +1,8 @@
 package fr.dalae.fileman
 
-import fr.dalae.fileman.domain.Origin
+import fr.dalae.fileman.domain.SourceDir
+import fr.dalae.fileman.domain.SourceFile
 import fr.dalae.fileman.repository.DocumentRepository
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.persistence.EntityManager
@@ -24,48 +24,55 @@ class DirectoryLoader(config: ApplicationProperties) {
     @Autowired
     lateinit var documentRepository: DocumentRepository
 
-    private val storageDir = Path.of(config.storagePath)
+    val storageDir = Path.of(config.storagePath)
         .apply { toFile().mkdirs() }
 
     val batchSize = config.batchSize
     var observer = CountingObserver.loggingObserver(batchSize)
 
     @Transactional
-    fun load(originDir: File) {
-        // TODO use Files.walkFileTree() to avoid following symlink for
+    fun load(sourceDir: SourceDir) {
+        entityManager.persist(sourceDir)
+
+        // NOTE alternative is to use NIO Files DirectoryStream<Path> to avoid following symlink for
         // both files and directories
-        val originParser = OriginParser(originDir)
+        // https://www.jmdoudoux.fr/java/dej/chap-nio2.htm
+        val originDir = sourceDir.path.toFile()
+        val documentParser = DocumentParser(sourceDir)
         originDir
             .walkTopDown()
             .onEnter {
                 log.info("Entering '${it.path}'.")
                 !Files.isSymbolicLink(it.toPath())
             }
-            .filter { it.isFile } // Do not return the directory itself
-            .map { it.relativeTo(originDir) }
-            .map { originParser.parse(it) }
-            .map { observer.notifyOne(); it }
+            .filter { it.isFile}
+            .map { it.toPath() }
+            .filter { !Files.isSymbolicLink(it) }
+            .map {
+                val relativePath = sourceDir.path.relativize(it)
+                var doc = documentParser.parse(relativePath)
+                doc = entityManager.merge(doc)
+                val sourceFile = SourceFile(sourceDir,relativePath, doc)
+                entityManager.merge(sourceFile)
+                observer.notifyOne();
+                log.info("File : '$relativePath'.");
+            }
             .windowed(batchSize, batchSize, true)
-            .forEach { mergeAllAndFlush(it) }
+            .forEach {
+                entityManager.flush()
+                entityManager.clear()
+            }
         observer.notifyDone()
     }
 
-    private fun mergeAllAndFlush(buffer: List<Origin>) {
-        buffer.forEach {
-            creatDocIfNew(it)
-            entityManager.merge(it)
-        }
-        entityManager.flush()
-        entityManager.clear()
-    }
 
-    private fun creatDocIfNew(origin: Origin) {
-        val doc = origin.document
+    private fun creatDocIfNew(sourceFile: SourceFile) {
+        val doc = sourceFile.document
         if (!documentRepository.existsById(doc.id)) {
             documentRepository.save(doc)
             val docAbsPath = doc.resolveInto(storageDir)
             Files.createDirectories(docAbsPath.parent)
-            Files.createLink(docAbsPath, origin.absPath)
+            Files.createLink(docAbsPath, sourceFile.fullPath)
         }
     }
 }

@@ -1,10 +1,9 @@
 # Objectif
 
-Fileman a pour but d'importer différentes sources de fichiers pour pouvoir
-les organiser, les sauvegarder, les partager et les indexer.
-L'utilisateur importe des nouvelles sources de données dans une répertoire de son choix.
-Ce répertoire est ajouté à Fileman qui va le scanner, indexer les fichiers, fusionner les doublons, 
-et ajouter les nouveaux fichiers en créant des hardlink.
+Fileman a pour but d'aggréger de manière continue plusieurs répertoires de données.
+Ces données sont indexées, dé-dupliquées et exposées à des tiers services qui pourront à leur tour les exploiter.
+Les répertoires source peuvent être modifiés et les évolutions seronts prises en compte de manière incrémentale.
+
 Le répertoire source n'est pas modifié et peut rester "vivant", par exemple en subissant des 
 updates par rsync de manière incrémentale.
 
@@ -15,18 +14,20 @@ updates par rsync de manière incrémentale.
   - se souvenir du mapping avec le(s) documents d'origine
   - merging par clé [name + date + size]
 - Hardlink des fichiers dans le stockage de référence local
+  
+## Lot 2
 - Filtrer les fichiers importés
   - Par extension
   - Par path
 
-## Lot 2
+## Lot 3
 Features
 - supprimer les doublons
     - basés sur lastModified + size
     - ou sur un full hash (type md5)
 - utiliser des hardlink pour l'importation du fichier et pour supprimer les doublons dans leur répertoire d'origine)
 - dedupliquer les doublons
-- merger les informations des doublons
+- merger les informations des doublons (les tags)
 - se souvenir des origines (multiples en cas de doublons) des fichiers
     - repertoire racine
     - chemin racine

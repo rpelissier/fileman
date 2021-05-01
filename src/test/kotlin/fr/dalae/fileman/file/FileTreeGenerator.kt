@@ -10,35 +10,40 @@ class FileTreeGenerator {
         const val MAX_SIZE = 10 * 1024 * 1024L
     }
 
-    fun generate(root: Path, files: Stream<FileDescriptor>) {
+    fun generate(root: Path, files: Stream<Node>) {
         files.filter {
             if (it.path.isAbsolute) throw IllegalArgumentException(
                 "Cannot generate '$it'. Only relative path are allowed."
             )
-            if (it.size > MAX_SIZE) throw IllegalArgumentException(
-                "Cannot generate '$it'. Only files smaller than $MAX_SIZE bytes are allowed. ")
             true
-        }.map { it ->
-            val absPath = root.resolve(it.path)
-            val absSymbolicLink = it.symbolicLinkTarget?.let { root.resolve(it) }
-            it.copy(path = absPath, symbolicLinkTarget = absSymbolicLink)
         }.forEach {
-            createFile(it)
+            createFile(root, it)
         }
     }
 
-    private fun createFile(fd: FileDescriptor) {
-        val file = fd.path.toFile()
-        if (fd.path.parent != null) {
-            fd.path.parent.toFile().mkdirs()
+    private fun createFile(root: Path, fd: Node) {
+        val absPath = root.resolve(fd.path).toAbsolutePath()
+        if (absPath.parent != null) {
+            absPath.parent.toFile().mkdirs()
         }
-        if (fd.symbolicLinkTarget != null) {
-            Files.createSymbolicLink(fd.path, fd.symbolicLinkTarget.toAbsolutePath())
-        } else {
-            RandomAccessFile(file, "rw").use {
-                it.setLength(fd.size)
+        when (fd) {
+            is SymLinkNode -> {
+                val absSymbolicLink = root.resolve(fd.symbolicLinkTarget).toAbsolutePath()
+                Files.createSymbolicLink(absPath, absSymbolicLink)
             }
-            file.setLastModified(fd.epochMillis)
+            is FileNode -> {
+                if (fd.size > MAX_SIZE) throw IllegalArgumentException(
+                    "Cannot generate '$fd'. Only files smaller than $MAX_SIZE bytes are allowed. "
+                )
+                val absFile = absPath.toFile()
+                RandomAccessFile(absFile, "rw").use {
+                    it.setLength(fd.size)
+                }
+                absFile.setLastModified(fd.epochMillis)
+            }
+            else -> {
+                throw IllegalArgumentException("Unknown kind of ${Node::class.simpleName}")
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package fr.dalae.fileman.file
 
+import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.nio.file.FileVisitResult
@@ -7,15 +9,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import org.junit.Test
-import org.slf4j.LoggerFactory
 
 class WalkFileTreeTest {
 
     private val log = LoggerFactory.getLogger(javaClass)
     val followSymbolicLink = true
 
-    val fileVisitor = object : SimpleFileVisitor<Path>() {
+    private val fileVisitor = object : SimpleFileVisitor<Path>() {
         override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
             log.info("Dir : '$dir'.")
             if (!followSymbolicLink && attrs.isSymbolicLink)

@@ -1,56 +1,55 @@
 package fr.dalae.fileman.domain
 
-import java.io.File
 import java.io.Serializable
 import java.nio.file.Path
 import javax.persistence.*
+import kotlin.io.path.name
 
 @Entity
+/**@Table(
+indexes = [
+Index(columnList = "name, lastModifiedEpochMs, size" )
+]
+)
+ */
 @IdClass(DocumentId::class)
 data class Document(
-    @Id
-    val name: String,
+
     @Id
     val lastModifiedEpochMs: Long,
+
     @Id
     val size: Long,
 
-    @Convert(converter = FileConverter::class)
+    @Id
+    @Column(columnDefinition = "varchar(32)")
+    val md5: String = "",
+
+    @Id
+    val hashCount: Int = 0,
+
+    @Convert(converter = PathConverter::class)
     @Column(columnDefinition = "varchar(512)")
-    val relativePath: File,
+    val relativePath: Path,
+
     val extension: String,
-    @ElementCollection
-    val tags: Set<String> = mutableSetOf()
-) {
-    val id: DocumentId
-        get() = DocumentId(name, lastModifiedEpochMs, size)
 
+    ) : DomainEntity() {
     fun resolveInto(storageDir: Path): Path {
-        return storageDir.resolve(relativePath.toPath())
+        return storageDir.resolve(relativePath)
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Document) return false
+    val name: String
+        get() = relativePath.fileName.toString()
 
-        if (name != other.name) return false
-        if (lastModifiedEpochMs != other.lastModifiedEpochMs) return false
-        if (size != other.size) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + lastModifiedEpochMs.hashCode()
-        result = 31 * result + size.hashCode()
-        return result
-    }
+    val id: DocumentId
+        get() = DocumentId(lastModifiedEpochMs, size, md5, hashCount)
 }
 
 // Composite key class must implement Serializable and have defaults.
 data class DocumentId(
-    val name: String = "",
-    val lastModifiedEpochMs: Long = 0L,
-    val size: Long = 0L
+    val lastModifiedEpochMs: Long = 0,
+    val size: Long = 0,
+    val md5: String = "",
+    val hashCount: Int = 0
 ) : Serializable

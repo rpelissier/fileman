@@ -1,31 +1,25 @@
-# ===================================================================
-# Spring Boot configuration for the "prod" profile.
-#
-# This configuration overrides the application.yml file.
-# ===================================================================
-
-# ===================================================================
-# Standard Spring Boot properties.
-# Full reference is available at:
-# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
-# ===================================================================
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/fileman
+    username: fileman
+    password: fileman
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: POSTGRESQL
+      #flyway will look for files in ./db/migration
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+          order_inserts: true
+application:
+  storagePath: "./storage"
+  batchSize: 1000
 
 logging:
-    level:
-        ROOT: ${LOG_LEVEL}
-        fr.dalae: ${LOG_LEVEL}
-    config: classpath:logback-spring.xml
-    file:
-        name: ${java.io.tmpdir}/spring.log
-
-spring:
-    profiles:
-        active: prod
-    datasource:
-        type: com.zaxxer.hikari.HikariDataSource
-        url: ${DATASOURCE_URL}
-        username: ${DATASOURCE_USERNAME}
-        password: ${DATASOURCE_PASSWORD}
-
-server:
-    port: ${PORT}
+  level:
+    ROOT: DEBUG
+    fr.dalae: DEBUG
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: debug
