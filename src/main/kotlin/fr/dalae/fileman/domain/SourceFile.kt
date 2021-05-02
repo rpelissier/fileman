@@ -1,25 +1,32 @@
 package fr.dalae.fileman.domain
 
-import java.io.Serializable
 import java.nio.file.Path
 import javax.persistence.*
 
 @Entity
-@IdClass(SourceFileId::class)
+@SequenceGenerator(initialValue = 1, name = "generator", sequenceName = "sourceFileSeq")
+@Table(
+    indexes = [
+        Index(columnList = "source_dir_id, relative_path", unique = true)
+    ]
+)
 class SourceFile(
     @ManyToOne(optional = false)
-    @MapsId
-    @JoinColumn(name = "sourceDirPathString")
-    // See https://vladmihalcea.com/the-best-way-to-map-a-onetoone-relationship-with-jpa-and-hibernate/
+    @JoinColumn(name="source_dir_id")
     val sourceDir: SourceDir,
 
-    relativePath: Path,
+    /**
+     * Path relative to sourceDir
+     */
+    @Convert(converter = PathConverter::class)
+    @Column(name="relative_path", columnDefinition = "varchar(512)")
+    val relativePath: Path,
 
     @ManyToOne(optional = false)
     val document : Document,
 
     @ManyToMany
-    val documentHistory: List<Document> = listOf(),
+    val documentHistory: List<Document> = listOf()
 
 ) : DomainEntity() {
 
@@ -28,32 +35,10 @@ class SourceFile(
         if (relativePath.isAbsolute) throw IllegalArgumentException("The path '$relativePath' should be relative, not absolute.")
     }
 
-    @Id
-    @Column(columnDefinition = "varchar(512)")
-    val sourceDirPathString : String = sourceDir.path.toString()
-
-    @Id
-    @Column(columnDefinition = "varchar(512)")
-    val relativePathString: String = relativePath.toString()
-
     /**
-     * Path relative to sourceDir
-     */
-    val relativePath: Path
-        get() = Path.of(relativePathString)
-
-    /**
-     * Path including sourceDir path (not necessarily absolute)
+     * Path including parent sourceDir path (not necessarily absolute)
      */
     val fullPath: Path
-        get() = sourceDir.path.resolve(relativePathString)
-
-    val id: SourceFileId
-        get() = SourceFileId(sourceDir.toString(), relativePathString)
+        get() = sourceDir.path.resolve(relativePath)
 }
 
-// Composite key class must implement Serializable and have defaults.
-data class SourceFileId(
-    val sourceDirPathString : String ="",
-    val relativePathString: String = ""
-) : Serializable

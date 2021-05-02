@@ -1,25 +1,17 @@
 package fr.dalae.fileman.domain
 
-import fr.dalae.fileman.file.FileUtils
-import java.io.Serializable
 import java.nio.file.Path
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.IdClass
+import javax.persistence.*
 
 @Entity
+@SequenceGenerator(initialValue = 1, name = "generator", sequenceName = "sourceDirSeq")
+@Table(
+    indexes = [
+        Index(columnList = "path", unique = true)
+    ]
+)
 class SourceDir(
-    path: Path
-) : DomainEntity() {
-    @Id
+    @Convert(converter = PathConverter::class)
     @Column(columnDefinition = "varchar(512)")
-    val pathString: String = path.toString()
-
     val path: Path
-        get() = Path.of(pathString)
-
-    companion object{
-        val UNKNOWN = SourceDir(FileUtils.UNKNOWN_PATH)
-    }
-}
+) : DomainEntity()
