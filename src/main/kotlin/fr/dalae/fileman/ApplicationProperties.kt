@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated
 @ConstructorBinding
 @ConfigurationProperties("application")
 data class ApplicationProperties(
-    val storagePath: String,
+    val storageDir: String,
     val batchSize: Int,
     val followSymbolicLink: Boolean = false
 )

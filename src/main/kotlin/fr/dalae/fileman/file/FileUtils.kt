@@ -8,6 +8,8 @@ import java.io.InputStream
 import java.math.BigInteger
 import java.security.DigestInputStream
 import java.security.MessageDigest
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
 class FileUtils {
@@ -20,6 +22,10 @@ class FileUtils {
         fun md5(inputStream: InputStream, length: Long): String {
             val boundedInputStream = BoundedInputStream(inputStream, length)
             return DigestUtils.md5DigestAsHex(boundedInputStream)
+        }
+
+        fun toEpochMillis(dateTime: LocalDateTime): Long {
+            return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         }
 
 

@@ -14,7 +14,7 @@ spring:
         generate_statistics: true
 
 application:
-  storagePath: "./build/test/storage"
+  storageDir: "./build/test/storage"
   batchSize: 1000
 
 logging:

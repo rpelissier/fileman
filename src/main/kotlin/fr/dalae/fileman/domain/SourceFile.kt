@@ -23,10 +23,10 @@ class SourceFile(
     val relativePath: Path,
 
     @ManyToOne(optional = false)
-    val document : Document,
+    var document : Document,
 
     @ManyToMany
-    val documentHistory: List<Document> = listOf()
+    val documentHistory: MutableList<Document> = mutableListOf()
 
 ) : DomainEntity() {
 

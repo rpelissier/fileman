@@ -10,15 +10,19 @@ data class FileNode(
     val size: Long = 0L
 ) : Node(path) {
     constructor(path: String, date: String, size: Long) :
-            this(Path.of(path),
+            this(Path.of(path), date, size)
+
+    constructor(path: Path, date: String, size: Long) :
+            this(path,
                 LocalDateTime.parse(date, DATE_TIME_FORMATTER),
                 size)
 
+
     companion object {
         val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-        val DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)
+        val DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)
     }
 
     val epochMillis: Long
-        get() = FileDateUtils.toEpochMillis(date)
+        get() = FileUtils.toEpochMillis(date)
 }

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface DocumentRepository : CrudRepository<Document, Long>{
 
-    fun findByLastModifiedEpochMsAndSizeOrderByHashedLengthAsc(lastModifiedEpochMs: Long, size: Long) : List<Document>
+    fun findByLastModifiedEpochMsAndSize(lastModifiedEpochMs: Long, size: Long) : List<Document>
 }

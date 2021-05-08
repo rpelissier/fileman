@@ -3,6 +3,8 @@ package fr.dalae.fileman
 import fr.dalae.fileman.domain.SourceDir
 import fr.dalae.fileman.domain.SourceFile
 import fr.dalae.fileman.repository.DocumentRepository
+import fr.dalae.fileman.service.DocumentService
+import fr.dalae.fileman.service.SourceFileService
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.persistence.EntityManager
@@ -22,9 +24,12 @@ class DirectoryLoader(config: ApplicationProperties) {
     lateinit var entityManager: EntityManager
 
     @Autowired
-    lateinit var documentRepository: DocumentRepository
+    lateinit var documentService: DocumentService
 
-    val storageDir = Path.of(config.storagePath)
+    @Autowired
+    lateinit var sourceFileService: SourceFileService
+
+    val storageDir = Path.of(config.storageDir)
         .apply { toFile().mkdirs() }
 
     val batchSize = config.batchSize
@@ -38,7 +43,6 @@ class DirectoryLoader(config: ApplicationProperties) {
         // both files and directories
         // https://www.jmdoudoux.fr/java/dej/chap-nio2.htm
         val originDir = sourceDir.path.toFile()
-        val documentParser = DocumentParser(sourceDir)
         originDir
             .walkTopDown()
             .onEnter {
@@ -50,12 +54,11 @@ class DirectoryLoader(config: ApplicationProperties) {
             .filter { !Files.isSymbolicLink(it) }
             .map {
                 val relativePath = sourceDir.path.relativize(it)
-                var doc = documentParser.parse(relativePath)
-                doc = entityManager.merge(doc)
-                val sourceFile = SourceFile(sourceDir,relativePath, doc)
-                entityManager.merge(sourceFile)
+                val document = documentService.save(sourceDir, relativePath)
+                val sourceFile = sourceFileService.save(sourceDir, relativePath, document)
                 observer.notifyOne();
                 log.info("File : '$relativePath'.");
+                sourceFile
             }
             .windowed(batchSize, batchSize, true)
             .forEach {
@@ -63,16 +66,5 @@ class DirectoryLoader(config: ApplicationProperties) {
                 entityManager.clear()
             }
         observer.notifyDone()
-    }
-
-
-    private fun creatDocIfNew(sourceFile: SourceFile) {
-        val doc = sourceFile.document
-        if (!documentRepository.existsById(doc.id)) {
-            documentRepository.save(doc)
-            val docAbsPath = doc.resolveInto(storageDir)
-            Files.createDirectories(docAbsPath.parent)
-            Files.createLink(docAbsPath, sourceFile.fullPath)
-        }
     }
 }
