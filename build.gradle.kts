@@ -37,3 +37,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
     systemProperty("spring.profiles.active", "test")
 }
+
+val tempDir = file("$buildDir/test")
+tasks.test {
+    doFirst {
+        delete(tempDir)
+    }
+}

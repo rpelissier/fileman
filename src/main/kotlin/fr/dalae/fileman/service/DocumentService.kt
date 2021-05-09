@@ -3,7 +3,7 @@ package fr.dalae.fileman.service
 import fr.dalae.fileman.ApplicationProperties
 import fr.dalae.fileman.domain.Document
 import fr.dalae.fileman.domain.SourceDir
-import fr.dalae.fileman.file.Hash
+import fr.dalae.fileman.file.HashSuite
 import fr.dalae.fileman.repository.DocumentRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -19,9 +19,13 @@ class DocumentService(conf: ApplicationProperties) {
 
     private val storageDir = Path.of(conf.storageDir)
 
+    init {
+        storageDir.toFile().mkdirs()
+    }
+
     fun save(sourceDir: SourceDir, relativePath: Path): Document {
         val path = sourceDir.path.resolve(relativePath)
-        val hash = Hash(path)
+        val hash = HashSuite(path)
         return merge(hash)
     }
 
@@ -31,8 +35,8 @@ class DocumentService(conf: ApplicationProperties) {
      * Hash only the beginning of the file that are enough to demonstrate the difference.
      * The only case where we need to hash the entire file is to demonstrate equality.
      */
-    private fun merge(hash: Hash): Document {
-        val file = hash.path.toFile()
+    private fun merge(hashSuite: HashSuite): Document {
+        val file = hashSuite.path.toFile()
         val lastModified = file.lastModified()
         val size = file.length()
         val ext = file.extension
@@ -46,27 +50,27 @@ class DocumentService(conf: ApplicationProperties) {
             .forEach { siblingDoc ->
             //If same binary don't create a new doc use this one
             val siblingHash = hash(siblingDoc)
-            val provedDifferent = hashUntilProvedDifferent(hash, siblingHash)
+            val provedDifferent = HashSuite.hashUntilProvedDifferent(hashSuite, siblingHash)
             siblingDoc.hashes = siblingHash.blockHashes
             docRepository.save(siblingDoc) //Hash might have changed
             if (!provedDifferent) return siblingDoc
         }
         //Every siblings are proved different, create a new doc
-        val doc = newDoc(lastModified, size, ext, hash)
+        val doc = newDoc(lastModified, size, ext, hashSuite)
         return docRepository.save(doc)
     }
 
-    private fun hash(document: Document): Hash {
+    private fun hash(document: Document): HashSuite {
         val path = storageDir.resolve(document.storageRelativePath)
-        return Hash(path, document.hashes)
+        return HashSuite(path, document.hashes)
     }
 
-    private fun newDoc(lastModified: Long, size: Long, ext: String, hash: Hash): Document {
-        val storageRelativePath = hardLinkToStorage(hash.path)
+    private fun newDoc(lastModified: Long, size: Long, ext: String, hashSuite: HashSuite): Document {
+        val storageRelativePath = hardLinkToStorage(hashSuite.path)
         return Document(
             lastModified,
             size,
-            hash.blockHashes,
+            hashSuite.blockHashes,
             storageRelativePath,
             ext
         )
@@ -79,26 +83,7 @@ class DocumentService(conf: ApplicationProperties) {
         return relativePath
     }
 
-    /**
-     * Compute the necessary hash to demonstrate difference or default to equality
-     */
-    private fun hashUntilProvedDifferent(pHash1: Hash, pHash2: Hash): Boolean {
-        if (areProvedDifferent(pHash1, pHash2)) return true
-        // More hash needed
-        val nextHash = if (pHash1.blockHashedCount < pHash2.blockHashedCount) pHash1.hashNext() else pHash2.hashNext()
-        //No more hash available means equality
-        if (nextHash == "") return false
-        //New iteration as a new hash is available
-        return hashUntilProvedDifferent(pHash1, pHash2)
-    }
 
-    /**
-     * Document are for sure differents if current hashes don't start
-     * with the same sequence
-     */
-    private fun areProvedDifferent(pHash1: Hash, pHash2: Hash): Boolean {
-        return !pHash1.blockHashes.startsWith(pHash2.blockHashes) && !pHash2.blockHashes.startsWith(pHash1.blockHashes)
-    }
 
 
 }

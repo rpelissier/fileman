@@ -23,12 +23,6 @@ class DocumentServiceTest {
     private val log = LoggerFactory.getLogger(javaClass)
     private val rootPath = Path.of("build/test")
 
-    @BeforeEach
-    fun before() {
-        rootPath.toFile().deleteRecursively()
-    }
-
-
     @Test
     fun test() {
         val nodeGenerator = NodeGenerator()
@@ -39,12 +33,12 @@ class DocumentServiceTest {
         var sourceDir = SourceDir(rootPath)
         sourceDir = sourceDirRepository.save(sourceDir)
 
-        nodeGenerator.generate(rootPath, fileNode)
+        nodeGenerator.generate(fileNode)
         val document = documentService.save(sourceDir, fileRelativePath)
         log.info(document.toString())
 
-        nodeGenerator.generate(rootPath, fileNode)
-        nodeGenerator.randomChange(rootPath, fileNode, 0,32)
+        nodeGenerator.generate(fileNode)
+        nodeGenerator.randomChange(fileNode, 0,32)
 
         val document2 = documentService.save(sourceDir, fileRelativePath)
         log.info(document2.toString())

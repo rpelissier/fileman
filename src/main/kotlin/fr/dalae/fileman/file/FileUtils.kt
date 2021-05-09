@@ -35,16 +35,12 @@ class FileUtils {
          */
         fun hashBlock(file: File, blockIndex: Int, blockSize: Int): String {
             val hashOffset = blockIndex * blockSize
-            var block = ByteArray(blockSize)
-            val nRead: Int
+            val block : ByteArray
             file.inputStream().use {
-                nRead = it.readNBytes(block, hashOffset, blockSize)
+                it.skip(hashOffset.toLong())
+                block = it.readNBytes(blockSize)
             }
-            if (nRead <= 0) return ""
-
-            if (nRead < block.size) {
-                block = block.copyOf(nRead)
-            }
+            if (block.isEmpty()) return ""
             return DigestUtils.md5DigestAsHex(block)
         }
     }

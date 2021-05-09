@@ -3,7 +3,7 @@ package fr.dalae.fileman.domain
 import java.nio.file.Path
 import javax.persistence.*
 
-@Entity
+@Entity(name = "source_file")
 @SequenceGenerator(initialValue = 1, name = "generator", sequenceName = "sourceFileSeq")
 @Table(
     indexes = [

@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 data class FileNode(
-    override val path: Path,
+    override var path: Path,
     val date: LocalDateTime = LocalDateTime.now(),
     val size: Long = 0L
 ) : Node(path) {
