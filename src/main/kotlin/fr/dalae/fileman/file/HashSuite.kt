@@ -11,14 +11,14 @@ class HashSuite(val path: Path, var blockHashes: String="") {
         /**
          * Compute the necessary hash to demonstrate difference or default to equality
          */
-        fun hashUntilProvedDifferent(pHashSuite1: HashSuite, pHashSuite2: HashSuite): Boolean {
-            if (areProvedDifferent(pHashSuite1, pHashSuite2)) return true
+        fun hashUntilProvedDifferent(suite1: HashSuite, suite2: HashSuite): Boolean {
+            if (areProvedDifferent(suite1, suite2)) return true
             // More hash needed
-            val nextHash = if (pHashSuite1.count < pHashSuite2.count) pHashSuite1.hashNext() else pHashSuite2.hashNext()
+            val nextHash = if (suite1.count < suite2.count) suite1.hashNext() else suite2.hashNext()
             //No more hash available means equality
             if (nextHash == "") return false
             //New iteration as a new hash is available
-            return hashUntilProvedDifferent(pHashSuite1, pHashSuite2)
+            return hashUntilProvedDifferent(suite1, suite2)
         }
 
         /**
@@ -42,4 +42,11 @@ class HashSuite(val path: Path, var blockHashes: String="") {
         blockHashes += hash
         return hash
     }
+}
+
+/**
+ * A way of setting a file length by number of blocks of size HASH_BLOCK_SIZE
+ */
+fun Int.BLOCK(): Long {
+    return this * HashSuite.HASH_BLOCK_SIZE.toLong()
 }

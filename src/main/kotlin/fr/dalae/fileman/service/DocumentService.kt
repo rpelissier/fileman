@@ -23,10 +23,14 @@ class DocumentService(conf: ApplicationProperties) {
         storageDir.toFile().mkdirs()
     }
 
-    fun save(sourceDir: SourceDir, relativePath: Path): Document {
+    fun merge(sourceDir: SourceDir, relativePath: Path): Document {
         val path = sourceDir.path.resolve(relativePath)
         val hash = HashSuite(path)
         return merge(hash)
+    }
+
+    fun refresh(document: Document):Document{
+        return docRepository.findById(document.id).orElseThrow()
     }
 
 

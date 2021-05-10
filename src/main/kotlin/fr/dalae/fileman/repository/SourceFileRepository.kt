@@ -9,6 +9,6 @@ import java.nio.file.Path
 
 @Repository
 interface SourceFileRepository : CrudRepository<SourceFile, Long>{
-    @Query("select s from #{#entityName} s where s.sourceDir.id = ?1 and s.relativePath = ?2")
+    @Query("select s from #{#entityName} s where s.sourceDir = ?1 and s.relativePath = ?2")
     fun findBySourceDirAndRelativePath(sourceDir: SourceDir, relativePath: Path) : SourceFile?
 }

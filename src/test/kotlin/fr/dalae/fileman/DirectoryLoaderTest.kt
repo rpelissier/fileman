@@ -21,7 +21,7 @@ class DirectoryLoaderTest {
             deleteRecursively()
             mkdirs()
         }
-        val sourceDir = SourceDir(Path.of("/Users/renaud/DEV/mts-filters"))
-        directoryLoader.load(sourceDir)
+        val sourceDirPath = Path.of("/Users/renaud/DEV")
+        directoryLoader.load(sourceDirPath)
     }
 }

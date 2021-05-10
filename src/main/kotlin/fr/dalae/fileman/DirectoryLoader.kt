@@ -1,9 +1,8 @@
 package fr.dalae.fileman
 
 import fr.dalae.fileman.domain.SourceDir
-import fr.dalae.fileman.domain.SourceFile
-import fr.dalae.fileman.repository.DocumentRepository
 import fr.dalae.fileman.service.DocumentService
+import fr.dalae.fileman.service.SourceDirService
 import fr.dalae.fileman.service.SourceFileService
 import java.nio.file.Files
 import java.nio.file.Path
@@ -24,6 +23,9 @@ class DirectoryLoader(config: ApplicationProperties) {
     lateinit var entityManager: EntityManager
 
     @Autowired
+    lateinit var sourceDirService: SourceDirService
+
+    @Autowired
     lateinit var documentService: DocumentService
 
     @Autowired
@@ -36,8 +38,8 @@ class DirectoryLoader(config: ApplicationProperties) {
     var observer = CountingObserver.loggingObserver(batchSize)
 
     @Transactional
-    fun load(sourceDir: SourceDir) {
-        entityManager.persist(sourceDir)
+    fun load(sourceDirPath: Path) {
+        val sourceDir = sourceDirService.merge(sourceDirPath)
 
         // NOTE alternative is to use NIO Files DirectoryStream<Path> to avoid following symlink for
         // both files and directories
@@ -54,8 +56,8 @@ class DirectoryLoader(config: ApplicationProperties) {
             .filter { !Files.isSymbolicLink(it) }
             .map {
                 val relativePath = sourceDir.path.relativize(it)
-                val document = documentService.save(sourceDir, relativePath)
-                val sourceFile = sourceFileService.save(sourceDir, relativePath, document)
+                val document = documentService.merge(sourceDir, relativePath)
+                val sourceFile = sourceFileService.merge(sourceDir, relativePath, document)
                 observer.notifyOne();
                 log.info("File : '$relativePath'.");
                 sourceFile

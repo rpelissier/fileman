@@ -25,7 +25,11 @@ class NodeGenerator {
             true
         }.forEach {
             it.withParentDir(root)
-            generate(it)
+            when(it){
+                is FileNode-> generateExact(it)
+                is SymLinkNode -> generate(it)
+                else -> log.warn("Skipping unknown type of Node '${it.javaClass.simpleName}'.")
+            }
         }
     }
 
@@ -38,21 +42,15 @@ class NodeGenerator {
         absFile.setLastModified(fileNode.epochMillis)
     }
 
-    /**
-     * Generates a Node, creates the parent dirs if necessary.
-     * Overwrites existing file.
-     */
-    fun generate(node: Node) {
-        when (node) {
-            is SymLinkNode -> {
-                generate(node)
-            }
-            is FileNode -> {
-                generate(node)
-            }
-            else -> {
-                throw IllegalArgumentException("Unknown kind of ${Node::class.simpleName}")
-            }
+    fun generateFastUnpredictable(node: FileNode) {
+        generate(node) { file: File, size: Long ->
+            generateUsingSetLength(file, size)
+        }
+    }
+
+    fun generateExact(node: FileNode, randomSeed: Long = System.currentTimeMillis()) {
+        generate(node) { file: File, size: Long ->
+            generateWritingRandomSuite(file, size, randomSeed)
         }
     }
 
@@ -60,28 +58,25 @@ class NodeGenerator {
      * Generate a file with the given properties.
      * Two options are proposed : deterministic (slow) and un-deterministic (fast)
      */
-    fun generate(node: FileNode, randomSeed: Long = -1) {
+    private fun generate(node: FileNode, generator: (File, Long) -> Unit) {
         if (node.size > MAX_SIZE) throw IllegalArgumentException(
             "Cannot generate '$node'. Only files smaller than $MAX_SIZE bytes are allowed. "
         )
         ensureParentDirExists(node.path)
+        Files.deleteIfExists(node.path)
         val absFile = node.path.toFile()
-        if (randomSeed < 0) {
-            fastGenerate(absFile, node.size)
-        } else {
-            exactGenerate(absFile, node.size, randomSeed)
-        }
+        generator(absFile, node.size)
         absFile.setLastModified(node.epochMillis)
         log.info("File '${absFile.path}' generated.")
     }
 
-    private fun fastGenerate(file: File, size: Long) {
+    private fun generateUsingSetLength(file: File, size: Long) {
         RandomAccessFile(file, "rw").use {
             it.setLength(size)
         }
     }
 
-    private fun exactGenerate(file: File, size: Long, randomSeed: Long) {
+    private fun generateWritingRandomSuite(file: File, size: Long, randomSeed: Long) {
         val random = Random(randomSeed)
         FileOutputStream(file).use {
             var remainingCount = size
@@ -95,6 +90,7 @@ class NodeGenerator {
 
     fun generate(node: SymLinkNode) {
         ensureParentDirExists(node.path)
+        Files.deleteIfExists(node.path)
         val absSymbolicLink = node.symbolicLinkTarget.toAbsolutePath()
         Files.createSymbolicLink(node.path, node.symbolicLinkTarget)
         log.info("Symlink '${absSymbolicLink}' generated.")
@@ -105,6 +101,5 @@ class NodeGenerator {
             absPath.parent.toFile().mkdirs()
         }
     }
-
 
 }

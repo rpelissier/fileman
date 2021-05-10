@@ -16,7 +16,7 @@ class HashTest {
     fun `Test hashNext() with file size is a multiple of block size`() {
 
         val fileNode = FileNode(path1, "2015-02-20T06:30:00.000", HashSuite.HASH_BLOCK_SIZE * 2L)
-        nodeGenerator.generate(fileNode)
+        nodeGenerator.generateExact(fileNode)
 
         val hash = HashSuite(path1)
         Assertions.assertNotEquals("", hash.hashNext())
@@ -30,7 +30,7 @@ class HashTest {
     fun `Test hashNext() with file size is NOT a multiple of block size`() {
 
         val fileNode = FileNode(path1, "2015-02-20T06:30:00.000", (HashSuite.HASH_BLOCK_SIZE * 2.5).toLong())
-        nodeGenerator.generate(fileNode)
+        nodeGenerator.generateExact(fileNode)
 
         val hash = HashSuite(path1)
         Assertions.assertNotEquals("", hash.hashNext())
@@ -46,11 +46,11 @@ class HashTest {
         val date = "2015-02-20T06:30:00.000"
         val size = HashSuite.HASH_BLOCK_SIZE * 3L
         val fileNode = FileNode(path1, date, size)
-        nodeGenerator.generate(fileNode, randomSeed)
+        nodeGenerator.generateExact(fileNode, randomSeed)
         val fileNode2 = FileNode(path2, date, size)
-        nodeGenerator.generate(fileNode2, randomSeed)
+        nodeGenerator.generateExact(fileNode2, randomSeed)
         val fileNode3 = FileNode(path3, date, size)
-        nodeGenerator.generate(fileNode3)
+        nodeGenerator.generateExact(fileNode3)
 
         //Modify half the second block
         nodeGenerator.randomChange(fileNode2, HashSuite.HASH_BLOCK_SIZE.toLong(), HashSuite.HASH_BLOCK_SIZE / 2)

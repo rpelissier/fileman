@@ -22,5 +22,5 @@ logging:
     ROOT: DEBUG
     fr.dalae: DEBUG
     org.hibernate: WARN #Set to INFO for hibernate stats
-    org.hibernate.SQL: DEBUG #Set to DEBUG to see individual SQL queries
+    org.hibernate.SQL: INFO #Set to DEBUG to see individual SQL queries
     org.hibernate.type.descriptor.sql.BasicBinder: INFO # Set to TRACE to see SQL parameters

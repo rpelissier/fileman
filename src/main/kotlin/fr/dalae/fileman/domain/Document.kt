@@ -1,5 +1,6 @@
 package fr.dalae.fileman.domain
 
+import fr.dalae.fileman.file.HashSuite
 import java.nio.file.Path
 import javax.persistence.*
 
@@ -26,4 +27,8 @@ data class Document(
 
     val extension: String,
 
-    ) : DomainEntity()
+    ) : DomainEntity() {
+    val hashCount: Int
+        get() = hashes.length / HashSuite.HASH_BLOCK_N_CHAR
+
+}

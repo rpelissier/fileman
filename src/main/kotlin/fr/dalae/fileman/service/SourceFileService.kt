@@ -14,7 +14,7 @@ class SourceFileService {
     @Autowired
     lateinit var sourceFileRepository: SourceFileRepository
 
-    fun save(sourceDir: SourceDir, relativePath: Path, document: Document): SourceFile {
+    fun merge(sourceDir: SourceDir, relativePath: Path, document: Document): SourceFile {
         var sourceFile = sourceFileRepository.findBySourceDirAndRelativePath(sourceDir, relativePath)
         if(sourceFile == null){
             sourceFile = SourceFile(sourceDir, relativePath, document)
