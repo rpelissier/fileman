@@ -92,7 +92,7 @@ class NodeGenerator {
     fun generate(node: SymLinkNode) {
         ensureParentDirExists(node.path)
         Files.deleteIfExists(node.path)
-        Files.createSymbolicLink(node.path, node.symbolicLinkTarget)
+        Files.createSymbolicLink(node.path, node.symbolicLinkTarget.toAbsolutePath())
         log.info("Symlink '${node.symbolicLinkTarget}' generated.")
     }
 

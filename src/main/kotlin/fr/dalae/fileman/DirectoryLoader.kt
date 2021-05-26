@@ -49,7 +49,7 @@ class DirectoryLoader(config: ApplicationProperties) {
                 sourceFile
             }
             .windowed(batchSize, batchSize, true)
-            .forEach {
+            .forEach { _ ->
                 entityManager.flush()
                 entityManager.clear()
             }
