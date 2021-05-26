@@ -50,7 +50,7 @@ class DocumentService(conf: ApplicationProperties) {
         )
 
         siblingDocs
-            .sortedByDescending { it.hashes.length }
+            .sortedByDescending { it.hashes.size }
             .forEach { siblingDoc ->
                 //If same binary don't create a new doc use this one
                 val siblingHash = hash(siblingDoc)

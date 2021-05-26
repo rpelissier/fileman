@@ -1,8 +1,11 @@
 package fr.dalae.fileman.file
 
 import java.nio.file.Path
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.min
 
-class HashSuite(val path: Path, var blockHashes: String="") {
+class HashSuite(val path: Path, var blockHashes: ArrayList<String> = arrayListOf()) {
 
     companion object {
         val HASH_BLOCK_SIZE = 1024 * 10
@@ -13,25 +16,52 @@ class HashSuite(val path: Path, var blockHashes: String="") {
          */
         fun hashUntilProvedDifferent(suite1: HashSuite, suite2: HashSuite): Boolean {
             if (areProvedDifferent(suite1, suite2)) return true
-            // More hash needed
-            val nextHash = if (suite1.count < suite2.count) suite1.hashNext() else suite2.hashNext()
-            //No more hash available means equality
-            if (nextHash == "") return false
-            //New iteration as a new hash is available
-            return hashUntilProvedDifferent(suite1, suite2)
+
+            //If we are here every existing hash are equals
+            while (true) {
+                // More hash needed
+                val hash1: String
+                val hash2: String
+                if (suite1.count < suite2.count) {
+                    hash1 = suite1.hashNext()
+                    hash2 = suite2.blockHashes[suite1.blockHashes.lastIndex]
+                    //If the smallest file is over, they are different.
+                    if (hash1.isEmpty()) return true
+                } else if (suite1.count > suite2.count) {
+                    hash2 = suite2.hashNext()
+                    hash1 = suite1.blockHashes[suite2.blockHashes.lastIndex]
+                    //If the smallest file is over, they are different.
+                    if (hash2.isEmpty()) return true
+                } else {
+                    //File have the same number of block. We need two extra blocks to progress
+                    hash1 = suite1.hashNext()
+                    hash2 = suite2.hashNext()
+                    //If both files are over, they are equals.
+                    if (hash1.isEmpty() && hash2.isEmpty()) return false
+                }
+
+                //If hashes are different, they are different.
+                if (hash1 != hash2) return true
+
+                //If we are here we need another run
+            }
         }
 
-        /**
-         * Document are for sure differents if current hashes don't start
-         * with the same sequence
-         */
-        fun areProvedDifferent(pHashSuite1: HashSuite, pHashSuite2: HashSuite): Boolean {
-            return !pHashSuite1.blockHashes.startsWith(pHashSuite2.blockHashes) && !pHashSuite2.blockHashes.startsWith(pHashSuite1.blockHashes)
+
+        fun areProvedDifferent(
+            suite1: HashSuite,
+            suite2: HashSuite
+        ): Boolean {
+            for (i in 0 until min(suite1.count, suite2.count)) {
+                if (suite1.blockHashes[i] != suite2.blockHashes[i])
+                    return true
+            }
+            return false
         }
     }
 
     val count: Int
-        get() = blockHashes.length / HASH_BLOCK_N_CHAR
+        get() = blockHashes.count()
 
     /**
      * Hash one more block and update the hashes list.
@@ -39,7 +69,7 @@ class HashSuite(val path: Path, var blockHashes: String="") {
      */
     fun hashNext(): String {
         val hash = FileUtils.hashBlock(path.toFile(), count, HASH_BLOCK_SIZE)
-        blockHashes += hash
+        if (hash.isNotEmpty()) blockHashes.add(hash)
         return hash
     }
 }

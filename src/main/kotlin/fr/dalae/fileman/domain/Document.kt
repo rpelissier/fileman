@@ -19,7 +19,7 @@ data class Document(
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    var hashes: String = "",
+    var hashes: ArrayList<String> = arrayListOf(),
 
     @Convert(converter = PathConverter::class)
     @Column(columnDefinition = "varchar(512)")
@@ -29,6 +29,6 @@ data class Document(
 
     ) : DomainEntity() {
     val hashCount: Int
-        get() = hashes.length / HashSuite.HASH_BLOCK_N_CHAR
+        get() = hashes.size
 
 }

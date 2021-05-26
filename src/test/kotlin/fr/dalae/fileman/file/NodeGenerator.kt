@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 class NodeGenerator {
     companion object {
-        const val MAX_SIZE = 10 * 1024 * 1024L
+        var MAX_SIZE = 10 * 1024 * 1024L
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
