@@ -1,13 +1,11 @@
 package fr.dalae.fileman.file
 
-import fr.dalae.fileman.domain.Document
 import org.apache.commons.io.input.BoundedInputStream
 import org.springframework.util.DigestUtils
 import java.io.File
 import java.io.InputStream
-import java.math.BigInteger
-import java.security.DigestInputStream
-import java.security.MessageDigest
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
@@ -35,13 +33,40 @@ class FileUtils {
          */
         fun hashBlock(file: File, blockIndex: Int, blockSize: Int): String {
             val hashOffset = blockIndex * blockSize
-            val block : ByteArray
+            val block: ByteArray
             file.inputStream().use {
                 it.skip(hashOffset.toLong())
                 block = it.readNBytes(blockSize)
             }
             if (block.isEmpty()) return ""
             return DigestUtils.md5DigestAsHex(block)
+        }
+
+        /**
+         * Provide an efficient way to iterate recursively through an entire directory using a Sequence.
+         * NOTE : more efficient alternative might be to use NIO Files DirectoryStream<Path>
+         * https://www.jmdoudoux.fr/java/dej/chap-nio2.htm
+         */
+        fun fileWalkingSequence(
+            rootDir: Path,
+            pathRelativeToRootDirectory: Boolean = true,
+            followSymbolicLinks: Boolean = false
+        ): Sequence<Path> {
+            val originDir = rootDir.toFile()
+            return originDir
+                .walkTopDown()
+                .onEnter {
+                    followSymbolicLinks || !Files.isSymbolicLink(it.toPath())
+                }
+                .filter { it.isFile }
+                .map { it.toPath() }
+                .filter { followSymbolicLinks || !Files.isSymbolicLink(it) }
+                .map {
+                    if (pathRelativeToRootDirectory)
+                        rootDir.relativize(it)
+                    else
+                        it
+                }
         }
     }
 

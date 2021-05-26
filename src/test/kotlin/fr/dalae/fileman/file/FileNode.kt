@@ -17,6 +17,9 @@ data class FileNode(
                 LocalDateTime.parse(date, DATE_TIME_FORMATTER),
                 size)
 
+    override fun resolveInto(rootDir: Path): FileNode {
+        return FileNode(rootDir.resolve(path), date, size)
+    }
 
     companion object {
         val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS"

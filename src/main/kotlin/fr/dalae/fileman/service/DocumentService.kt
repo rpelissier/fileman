@@ -29,7 +29,7 @@ class DocumentService(conf: ApplicationProperties) {
         return merge(hash)
     }
 
-    fun refresh(document: Document):Document{
+    fun refresh(document: Document): Document {
         return docRepository.findById(document.id).orElseThrow()
     }
 
@@ -52,13 +52,13 @@ class DocumentService(conf: ApplicationProperties) {
         siblingDocs
             .sortedByDescending { it.hashes.length }
             .forEach { siblingDoc ->
-            //If same binary don't create a new doc use this one
-            val siblingHash = hash(siblingDoc)
-            val provedDifferent = HashSuite.hashUntilProvedDifferent(hashSuite, siblingHash)
-            siblingDoc.hashes = siblingHash.blockHashes
-            docRepository.save(siblingDoc) //Hash might have changed
-            if (!provedDifferent) return siblingDoc
-        }
+                //If same binary don't create a new doc use this one
+                val siblingHash = hash(siblingDoc)
+                val provedDifferent = HashSuite.hashUntilProvedDifferent(hashSuite, siblingHash)
+                siblingDoc.hashes = siblingHash.blockHashes
+                docRepository.save(siblingDoc) //Hash might have changed
+                if (!provedDifferent) return siblingDoc
+            }
         //Every siblings are proved different, create a new doc
         val doc = newDoc(lastModified, size, ext, hashSuite)
         return docRepository.save(doc)
@@ -81,13 +81,19 @@ class DocumentService(conf: ApplicationProperties) {
     }
 
     private fun hardLinkToStorage(existingPath: Path): Path {
-        val relativePath = Path.of(UUID.randomUUID().toString())
+        val uuid = UUID.randomUUID().toString()
+        //To avoid storing 100,000 in a flat directory structure
+        //we use the first two pair of hexa to create 2 levels.
+        val relativePath = Path.of(
+            uuid.substring(0..1),
+            uuid.substring(2..3),
+            uuid.substring(4)
+        )
         val absPath = storageDir.resolve(relativePath)
+        absPath.parent.toFile().mkdirs()
         Files.createLink(absPath, existingPath);
         return relativePath
     }
-
-
 
 
 }

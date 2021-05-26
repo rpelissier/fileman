@@ -23,10 +23,11 @@ class NodeGenerator {
                 "Cannot generate '$it'. Only relative path are allowed."
             )
             true
+        }.map {
+            it.resolveInto(root)
         }.forEach {
-            it.withParentDir(root)
-            when(it){
-                is FileNode-> generateExact(it)
+            when (it) {
+                is FileNode -> generateExact(it)
                 is SymLinkNode -> generate(it)
                 else -> log.warn("Skipping unknown type of Node '${it.javaClass.simpleName}'.")
             }
@@ -91,9 +92,8 @@ class NodeGenerator {
     fun generate(node: SymLinkNode) {
         ensureParentDirExists(node.path)
         Files.deleteIfExists(node.path)
-        val absSymbolicLink = node.symbolicLinkTarget.toAbsolutePath()
         Files.createSymbolicLink(node.path, node.symbolicLinkTarget)
-        log.info("Symlink '${absSymbolicLink}' generated.")
+        log.info("Symlink '${node.symbolicLinkTarget}' generated.")
     }
 
     private fun ensureParentDirExists(absPath: Path) {
