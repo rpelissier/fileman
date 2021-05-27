@@ -25,9 +25,6 @@ class DirectoryLoader(config: ApplicationProperties) {
     lateinit var sourceDirService: SourceDirService
 
     @Autowired
-    lateinit var documentService: DocumentService
-
-    @Autowired
     lateinit var sourceFileService: SourceFileService
 
     val storageDir = Path.of(config.storageDir)
@@ -42,8 +39,7 @@ class DirectoryLoader(config: ApplicationProperties) {
         val pathSequence = FileUtils.fileWalkingSequence(sourceDir.path)
         pathSequence
             .map {
-                val document = documentService.merge(sourceDir, it)
-                val sourceFile = sourceFileService.merge(sourceDir, it, document)
+                val sourceFile = sourceFileService.merge(sourceDir, it)
                 observer.notifyOne();
                 log.info("File : '$it'.");
                 sourceFile

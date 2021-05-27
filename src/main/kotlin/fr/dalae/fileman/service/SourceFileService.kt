@@ -14,13 +14,35 @@ class SourceFileService {
     @Autowired
     lateinit var sourceFileRepository: SourceFileRepository
 
-    fun merge(sourceDir: SourceDir, relativePath: Path, document: Document): SourceFile {
+    @Autowired
+    lateinit var documentService: DocumentService
+
+    fun merge(sourceDir: SourceDir, relativePath: Path): SourceFile {
+
         var sourceFile = sourceFileRepository.findBySourceDirAndRelativePath(sourceDir, relativePath)
-        if(sourceFile == null){
+
+        if (sourceFile == null) {
+            //First time we see this file
+            val document = documentService.merge(sourceDir, relativePath)
             sourceFile = SourceFile(sourceDir, relativePath, document)
-        }else{
-            sourceFile.documentHistory.add(sourceFile.document)
-            sourceFile.document = document
+            document.sourcefiles.add(sourceFile)
+        } else {
+            //This file is already present.
+            val file = sourceDir.path.resolve(relativePath).toFile()
+            val lastModified = file.lastModified()
+            val size = file.length()
+
+            //Don't check the doc hashes if same lastmodified and same size, otherwise it means full hash
+            val existingDoc = sourceFile.document
+            if (existingDoc.size == size && existingDoc.lastModifiedEpochMs == lastModified)
+                return sourceFile
+
+            //The doc might have changed and we need to hash to prove difference
+            val document = documentService.merge(sourceDir, relativePath)
+            if (document != sourceFile.document) {
+                sourceFile.documentHistory.add(sourceFile.document)
+                sourceFile.document = document
+            }
         }
         sourceFileRepository.save(sourceFile)
         return sourceFile

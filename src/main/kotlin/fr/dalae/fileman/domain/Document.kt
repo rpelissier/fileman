@@ -7,7 +7,8 @@ import javax.persistence.*
 @Entity
 @Table(
     indexes = [
-        Index(columnList = "lastModifiedEpochMs, size, hashes", unique = true)
+        Index(columnList = "lastModifiedEpochMs, size"),
+        Index(columnList = "extension")
     ]
 )
 @SequenceGenerator(initialValue = 1, name = "generator", sequenceName = "documentSeq")
@@ -27,8 +28,13 @@ data class Document(
 
     val extension: String,
 
+    @OneToMany(mappedBy = "document")
+    val sourcefiles : MutableSet<SourceFile> = hashSetOf()
+
     ) : DomainEntity() {
     val hashCount: Int
         get() = hashes.size
+
+
 
 }

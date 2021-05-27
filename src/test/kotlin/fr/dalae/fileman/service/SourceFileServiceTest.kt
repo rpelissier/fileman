@@ -45,7 +45,7 @@ class SourceFileServiceTest {
         val document2 = documentService.merge(sourceDir, path2)
         log.info(document2.toString())
 
-        sourceFileService.merge(sourceDir, path, document)
-        sourceFileService.merge(sourceDir, path2, document2)
+        sourceFileService.merge(sourceDir, path)
+        sourceFileService.merge(sourceDir, path2)
     }
 }

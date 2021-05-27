@@ -3,6 +3,7 @@ package fr.dalae.fileman.service
 import fr.dalae.fileman.ApplicationProperties
 import fr.dalae.fileman.domain.Document
 import fr.dalae.fileman.domain.SourceDir
+import fr.dalae.fileman.domain.SourceFile
 import fr.dalae.fileman.file.HashSuite
 import fr.dalae.fileman.repository.DocumentRepository
 import org.springframework.beans.factory.annotation.Autowired
