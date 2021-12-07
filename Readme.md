@@ -7,18 +7,33 @@ Les répertoires source peuvent être modifiés et les évolutions seronts prise
 Le répertoire source n'est pas modifié et peut rester "vivant", par exemple en subissant des 
 updates par rsync de manière incrémentale.
 
-## Lot 1
+## Lot INDEX DIRECTORY
 - Scanner un répertoire
 - L'indexer en BDD
   - convertir les noeuds des paths en tags
   - se souvenir du mapping avec le(s) documents d'origine
   - merging par clé [name + date + size]
+
+## Lot HARDLINK DB
 - Hardlink des fichiers dans le stockage de référence local
   
-## Lot 2
-- Filtrer les fichiers importés
+## Lot INDEX FILTER
+- Filtrer les fichiers importés 
   - Par extension
   - Par path
+  - Par directory-contains(file pattern) (pour filter les BDD de code)
+
+OPT : rapport json de tous les fichiers / répertoire filtrés
+
+## Lot SEARCH
+
+- Chercher par :
+  - extension
+  - name
+
+## Lot DUPLICATE REPORT
+
+- Rapport json de tous les fichiers dupliqués
 
 ## Lot 3
 Features

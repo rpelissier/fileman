@@ -21,7 +21,7 @@ class DirectoryLoaderTest {
             deleteRecursively()
             mkdirs()
         }
-        val sourceDirPath = Path.of("/Users/renaud/syno-data")
+        val sourceDirPath = Path.of("/Users/renaud/Downloads")
         directoryLoader.load(sourceDirPath)
     }
 }

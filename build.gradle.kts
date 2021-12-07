@@ -67,5 +67,5 @@ tasks.create("npmDeployToBack", Copy::class.java) {
 }
 
 tasks.compileJava {
-    dependsOn("npmDeployToBack")
+    //dependsOn("npmDeployToBack")
 }
