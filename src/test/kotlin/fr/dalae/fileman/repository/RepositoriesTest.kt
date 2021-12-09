@@ -25,7 +25,7 @@ class RepositoriesTest {
         val sourceDir = SourceDir(Path.of("/Volumes/HDD1"))
         sourceDirRepository.save(sourceDir)
 
-        val doc1 = Document(0L, 500, arrayListOf(), Path.of("some-storage-path/a2eff91a"), "txt")
+        val doc1 = Document(0L, 500, arrayListOf(),"txt")
         documentRepository.save(doc1)
 
         val origin = SourceFile(sourceDir, Path.of("toto.txt"), doc1)

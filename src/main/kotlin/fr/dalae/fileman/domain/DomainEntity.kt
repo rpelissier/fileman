@@ -5,9 +5,6 @@ import javax.persistence.GenerationType
 
 import javax.persistence.GeneratedValue
 
-
-
-
 @MappedSuperclass
 abstract class DomainEntity {
 

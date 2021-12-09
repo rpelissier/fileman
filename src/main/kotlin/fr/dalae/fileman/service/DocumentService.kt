@@ -3,9 +3,9 @@ package fr.dalae.fileman.service
 import fr.dalae.fileman.ApplicationProperties
 import fr.dalae.fileman.domain.Document
 import fr.dalae.fileman.domain.SourceDir
-import fr.dalae.fileman.domain.SourceFile
 import fr.dalae.fileman.file.HashSuite
 import fr.dalae.fileman.repository.DocumentRepository
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.nio.file.Files
@@ -14,6 +14,8 @@ import java.util.*
 
 @Service
 class DocumentService(conf: ApplicationProperties) {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     lateinit var docRepository: DocumentRepository
@@ -45,43 +47,44 @@ class DocumentService(conf: ApplicationProperties) {
         val lastModified = file.lastModified()
         val size = file.length()
         val ext = file.extension
-        val siblingDocs = docRepository.findByLastModifiedEpochMsAndSize(
+        val attachedSiblingDocs = docRepository.findByLastModifiedEpochMsAndSize(
             lastModified,
             size
         )
 
-        siblingDocs
+        log.debug("Found ${attachedSiblingDocs.size} siblingDocs : ${attachedSiblingDocs.map { it.id }}")
+
+        attachedSiblingDocs
             .sortedByDescending { it.hashes.size }
-            .forEach { siblingDoc ->
+            .forEach { attachedSiblingDoc ->
                 //If same binary don't create a new doc use this one
-                val siblingHash = hash(siblingDoc)
+                val siblingHash = hash(attachedSiblingDoc)
                 val provedDifferent = HashSuite.hashUntilProvedDifferent(hashSuite, siblingHash)
-                siblingDoc.hashes = siblingHash.blockHashes
-                docRepository.save(siblingDoc) //Hash might have changed
-                if (!provedDifferent) return siblingDoc
+                attachedSiblingDoc.hashes = siblingHash.blockHashes
+                docRepository.save(attachedSiblingDoc) //Hash might have changed
+                if (!provedDifferent) return attachedSiblingDoc
             }
         //Every siblings are proved different, create a new doc
+        log.debug("Creating new doc for file $file with hashes ${hashSuite.blockHashes}")
         val doc = newDoc(lastModified, size, ext, hashSuite)
         return docRepository.save(doc)
     }
 
     private fun hash(document: Document): HashSuite {
-        val path = storageDir.resolve(document.storageRelativePath)
+        val path = document.sourceFiles.first().fullPath
         return HashSuite(path, document.hashes)
     }
 
     private fun newDoc(lastModified: Long, size: Long, ext: String, hashSuite: HashSuite): Document {
-        val storageRelativePath = hardLinkToStorage(hashSuite.path)
         return Document(
             lastModified,
             size,
             hashSuite.blockHashes,
-            storageRelativePath,
             ext
         )
     }
 
-    private fun hardLinkToStorage(existingPath: Path): Path {
+    fun hardLinkToStorage(existingPath: Path): Path {
         val uuid = UUID.randomUUID().toString()
         //To avoid storing 100,000 in a flat directory structure
         //we use the first two pair of hexa to create 2 levels.
@@ -95,6 +98,4 @@ class DocumentService(conf: ApplicationProperties) {
         Files.createLink(absPath, existingPath);
         return relativePath
     }
-
-
 }

@@ -45,7 +45,6 @@ class DocumentServiceTest {
 
         Assertions.assertEquals(document.lastModifiedEpochMs, document2.lastModifiedEpochMs)
         Assertions.assertEquals(document.size, document2.size)
-        Assertions.assertNotEquals(document.storageRelativePath, document2.storageRelativePath)
         Assertions.assertNotEquals(document.id, document2.id)
     }
 

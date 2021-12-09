@@ -11,10 +11,3 @@ spring:
 application:
   storageDir: "./storage"
   batchSize: 1000
-
-logging:
-  level:
-    ROOT: DEBUG
-    fr.dalae: DEBUG
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: debug

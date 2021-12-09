@@ -16,7 +16,6 @@ class SourceDirService {
         return sourceDirRepository
             .findByPath(sourceDirPath)
             ?: sourceDirRepository.save(SourceDir(sourceDirPath))
-
     }
 
 }

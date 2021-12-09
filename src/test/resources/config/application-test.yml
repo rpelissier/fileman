@@ -11,7 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        generate_statistics: true
+        generate_statistics: false
 
 application:
   storageDir: "./build/test/storage"
@@ -19,7 +19,7 @@ application:
 
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: WARN
     fr.dalae: DEBUG
     org.hibernate: WARN #Set to INFO for hibernate stats
     org.hibernate.SQL: INFO #Set to DEBUG to see individual SQL queries
