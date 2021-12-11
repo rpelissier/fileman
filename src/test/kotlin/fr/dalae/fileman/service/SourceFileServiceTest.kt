@@ -1,9 +1,9 @@
 package fr.dalae.fileman.service
 
-import fr.dalae.fileman.file.BLOCK
+import fr.dalae.fileman.domain.BLOCK
+import fr.dalae.fileman.domain.SourceFile
 import fr.dalae.fileman.file.FileNode
 import fr.dalae.fileman.file.NodeGenerator
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +21,7 @@ class SourceFileServiceTest {
     lateinit var sourceDirService: SourceDirService
 
     @Autowired
-    lateinit var documentService: DocumentService
+    lateinit var binaryService: BinaryService
 
     @Autowired
     lateinit var sourceFileService: SourceFileService
@@ -39,13 +39,13 @@ class SourceFileServiceTest {
 
         var sourceDir = sourceDirService.merge(rootPath)
 
-        val document = documentService.merge(sourceDir, path)
+        val document = binaryService.merge(SourceFile.create(sourceDir, path))
         log.info(document.toString())
 
-        val document2 = documentService.merge(sourceDir, path2)
+        val document2 = binaryService.merge(SourceFile.create(sourceDir, path2))
         log.info(document2.toString())
 
-        sourceFileService.merge(sourceDir, path)
-        sourceFileService.merge(sourceDir, path2)
+        sourceFileService.merge(SourceFile.create(sourceDir, path))
+        sourceFileService.merge(SourceFile.create(sourceDir, path2))
     }
 }

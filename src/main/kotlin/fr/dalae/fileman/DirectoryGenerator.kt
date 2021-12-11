@@ -1,6 +1,6 @@
 package fr.dalae.fileman
 
-import fr.dalae.fileman.service.DocumentService
+import fr.dalae.fileman.service.BinaryService
 import fr.dalae.fileman.service.SourceDirService
 import fr.dalae.fileman.service.SourceFileService
 import org.slf4j.Logger
@@ -17,7 +17,7 @@ class DirectoryGenerator {
     lateinit var sourceDirService: SourceDirService
 
     @Autowired
-    lateinit var documentService: DocumentService
+    lateinit var binaryService: BinaryService
 
     @Autowired
     lateinit var sourceFileService: SourceFileService

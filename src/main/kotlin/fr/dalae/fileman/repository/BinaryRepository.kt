@@ -1,0 +1,11 @@
+package fr.dalae.fileman.repository
+
+import fr.dalae.fileman.domain.Binary
+import org.springframework.data.repository.CrudRepository
+import org.springframework.stereotype.Repository
+
+@Repository
+interface BinaryRepository : CrudRepository<Binary, Long>{
+
+    fun findByLastModifiedEpochMsAndSize(lastModifiedEpochMs: Long, size: Long) : List<Binary>
+}

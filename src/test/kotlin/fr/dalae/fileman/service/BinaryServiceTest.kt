@@ -1,7 +1,9 @@
 package fr.dalae.fileman.service
 
-import fr.dalae.fileman.domain.SourceDir
-import fr.dalae.fileman.file.*
+import fr.dalae.fileman.domain.BLOCK
+import fr.dalae.fileman.domain.SourceFile
+import fr.dalae.fileman.file.FileNode
+import fr.dalae.fileman.file.NodeGenerator
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -10,13 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import java.nio.file.Path
 
 @SpringBootTest
-class DocumentServiceTest {
+class BinaryServiceTest {
 
     @Autowired
     lateinit var sourceDirService: SourceDirService
 
     @Autowired
-    lateinit var documentService: DocumentService
+    lateinit var binaryService: BinaryService
 
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -35,13 +37,13 @@ class DocumentServiceTest {
 
         var sourceDir = sourceDirService.merge(rootPath)
 
-        val document = documentService.merge(sourceDir, path)
+        val document = binaryService.merge(SourceFile.create(sourceDir, path))
         log.info(document.toString())
-        Assertions.assertEquals(0, document.hashCount)
+        Assertions.assertEquals(0, document.hashes.size)
 
-        val document2 = documentService.merge(sourceDir, path2)
+        val document2 = binaryService.merge(SourceFile.create(sourceDir, path2))
         log.info(document2.toString())
-        Assertions.assertEquals(1, document2.hashCount)
+        Assertions.assertEquals(1, document2.hashes.size)
 
         Assertions.assertEquals(document.lastModifiedEpochMs, document2.lastModifiedEpochMs)
         Assertions.assertEquals(document.size, document2.size)
@@ -61,11 +63,11 @@ class DocumentServiceTest {
 
         var sourceDir = sourceDirService.merge(rootPath)
 
-        var document = documentService.merge(sourceDir, path)
+        var document = binaryService.merge(SourceFile.create(sourceDir, path))
         log.info(document.toString())
 
-        val document2 = documentService.merge(sourceDir, path2)
-        document = documentService.refresh(document)
+        val document2 = binaryService.merge(SourceFile.create(sourceDir, path2))
+        document = binaryService.refresh(document)
         log.info(document2.toString())
 
         Assertions.assertEquals(document.id, document2.id)

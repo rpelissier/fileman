@@ -1,5 +1,7 @@
 package fr.dalae.fileman.file
 
+import fr.dalae.fileman.domain.BLOCK
+import fr.dalae.fileman.domain.Binary
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
@@ -80,7 +82,7 @@ class HashTest {
         val fileNode2 = FileNode(path2, date, size)
         nodeGenerator.generateExact(fileNode2, randomSeed)
 
-        val hash1 = HashSuite(fileNode.path)
+        val hash1 = Binary(fileNode.path)
         val hash2 = HashSuite(fileNode2.path)
 
         val different = HashSuite.hashUntilProvedDifferent(hash1, hash2)

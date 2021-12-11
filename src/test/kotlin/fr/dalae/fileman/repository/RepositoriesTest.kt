@@ -1,6 +1,6 @@
 package fr.dalae.fileman.repository
 
-import fr.dalae.fileman.domain.Document
+import fr.dalae.fileman.domain.Binary
 import fr.dalae.fileman.domain.SourceDir
 import fr.dalae.fileman.domain.SourceFile
 import org.junit.jupiter.api.Test
@@ -17,7 +17,7 @@ class RepositoriesTest {
     lateinit var sourceFileRepository: SourceFileRepository
 
     @Autowired
-    lateinit var documentRepository: DocumentRepository
+    lateinit var binaryRepository: BinaryRepository
 
     @Test
     fun `Should persist a SourceFile entity`() {
@@ -25,10 +25,10 @@ class RepositoriesTest {
         val sourceDir = SourceDir(Path.of("/Volumes/HDD1"))
         sourceDirRepository.save(sourceDir)
 
-        val doc1 = Document(0L, 500, arrayListOf(),"txt")
-        documentRepository.save(doc1)
+        val bin1 = Binary(0L, 500, arrayListOf())
+        binaryRepository.save(bin1)
 
-        val origin = SourceFile(sourceDir, Path.of("toto.txt"), doc1)
+        val origin = SourceFile.create(sourceDir, Path.of("toto.txt"))
         sourceFileRepository.save(origin)
     }
 

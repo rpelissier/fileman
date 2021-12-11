@@ -1,12 +1,19 @@
 package fr.dalae.fileman.domain
 
+import java.io.File
 import java.nio.file.Path
 import javax.persistence.*
+import kotlin.io.path.extension
 
+/**
+ * A pointer to a file within a source dir.
+ */
 @Entity(name = "source_file")
 @SequenceGenerator(initialValue = 1, name = "generator", sequenceName = "sourceFileSeq")
 @Table(
     indexes = [
+        Index(columnList = "lastModifiedEpochMs, size"),
+        Index(columnList = "extension"),
         Index(columnList = "source_dir_id, relative_path", unique = true)
     ]
 )
@@ -22,14 +29,23 @@ class SourceFile(
     @Column(name="relative_path", columnDefinition = "varchar(512)")
     val relativePath: Path,
 
-    @ManyToOne(optional = false)
-    var document : Document,
+    val lastModifiedEpochMs: Long,
 
-    @ManyToMany
-    val documentHistory: MutableList<Document> = mutableListOf()
+    val size: Long,
+
+    val extension: String,
 
 ) : DomainEntity() {
 
+    companion object{
+        fun create(sourceDir: SourceDir, relativePath: Path) : SourceFile{
+            val file = sourceDir.path.resolve(relativePath).toFile()
+            val lastModified = file.lastModified()
+            val size = file.length()
+            val ext = file.extension
+            return SourceFile(sourceDir, relativePath, lastModified, size, ext)
+        }
+    }
 
     init {
         if (relativePath.isAbsolute) throw IllegalArgumentException("The path '$relativePath' should be relative, not absolute.")
@@ -38,7 +54,7 @@ class SourceFile(
     /**
      * Path including parent sourceDir path (not necessarily absolute)
      */
-    val fullPath: Path
-        get() = sourceDir.path.resolve(relativePath)
+    val file: File
+        get() = sourceDir.path.resolve(relativePath).toFile()
 }
 
