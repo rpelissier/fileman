@@ -52,28 +52,35 @@ class BinaryService(conf: ApplicationProperties) {
     private fun merge(file: File): Binary {
         val lastModified = file.lastModified()
         val size = file.length()
-        val binary = Binary(lastModified, size)
+        val newBinary = Binary(lastModified, size)
 
-        val attachedSiblingBinaries = binaryRepository.findByLastModifiedEpochMsAndSize(
+        val siblingBinaries = binaryRepository.findByLastModifiedEpochMsAndSize(
             lastModified,
             size
         )
 
-        log.debug("Found ${attachedSiblingBinaries.size} siblingDocs : ${attachedSiblingBinaries.map { it.id }}")
+        log.debug("Found ${siblingBinaries.size} siblingDocs : ${siblingBinaries.map { it.id }}")
 
-        attachedSiblingBinaries
+        siblingBinaries
             .sortedByDescending { it.hashes.size }
-            .forEach { attachedSiblingBin ->
-                //If same binary don't create a new doc use this one
-                val siblingFile = attachedSiblingBin.sourceFiles.first().file
+            .forEach { siblingBinary ->
+                //TODO
+                // At some point if one of the siblingBinary.sourceFiles has
+                // the same name as our file we should consider that is is enough
+                // to consider them equals without hashing.
+                // If it is not the case we are probably in a non-human file database.
+
+
+                //As all file are the same binary, let's take the first one.
+                val siblingFile = siblingBinary.sourceFiles.first().file
                 val provedDifferent =
-                    HashUtils.hashUntilProvedDifferent(file, binary.hashes, siblingFile, attachedSiblingBin.hashes)
-                binaryRepository.save(attachedSiblingBin) //Hash might have changed
-                if (!provedDifferent) return attachedSiblingBin
+                    HashUtils.hashUntilProvedDifferent(file, newBinary.hashes, siblingFile, siblingBinary.hashes)
+                binaryRepository.save(siblingBinary) //Hash might have changed
+                if (!provedDifferent) return siblingBinary
             }
         //Every siblings are proved different, create a new doc
-        log.debug("Creating new Binary for file $file with hashes ${binary.hashes}")
-        return binaryRepository.save(binary)
+        log.debug("Creating new Binary for file $file with hashes ${newBinary.hashes}")
+        return binaryRepository.save(newBinary)
     }
 
 

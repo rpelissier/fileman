@@ -20,4 +20,9 @@ class SourceDirService {
             ?: sourceDirRepository.save(SourceDir(sourceDirPath))
     }
 
+    @Transactional
+    fun find(sourceDirPath: Path): SourceDir {
+        return sourceDirRepository
+            .findByPath(sourceDirPath)?:throw Exception("SourceDir $sourceDirPath not found.")
+    }
 }

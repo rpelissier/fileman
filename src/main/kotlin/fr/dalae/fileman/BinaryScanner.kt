@@ -1,6 +1,7 @@
 package fr.dalae.fileman
 
 import fr.dalae.fileman.file.FileUtils
+import fr.dalae.fileman.service.BinaryService
 import fr.dalae.fileman.service.SourceDirService
 import fr.dalae.fileman.service.SourceFileService
 import org.slf4j.Logger
@@ -13,7 +14,7 @@ import javax.persistence.PersistenceContext
 import javax.transaction.Transactional
 
 @Service
-class DirectoryLoader(config: ApplicationProperties) {
+class BinaryScanner(config: ApplicationProperties) {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -26,16 +27,19 @@ class DirectoryLoader(config: ApplicationProperties) {
     @Autowired
     lateinit var sourceFileService: SourceFileService
 
+    @Autowired
+    lateinit var binaryService: BinaryService
+
     final val batchSize = config.batchSize
     var observer = CountingObserver.loggingObserver(batchSize)
 
     @Transactional
-    fun load(sourceDirPath: Path) {
-        val sourceDir = sourceDirService.merge(sourceDirPath)
-        val pathSequence = FileUtils.fileWalkingSequence(sourceDir.path)
-        pathSequence
+    fun scan(sourceDirPath: Path) {
+        val sourceDir = sourceDirService.find(sourceDirPath)
+        val sourceFiles = sourceFileService.findAll(sourceDir)
+        sourceFiles
             .map {
-                val sourceFile = sourceFileService.merge(sourceDir, it)
+                val sourceFile = binaryService.merge(it)
                 observer.notifyOne();
                 log.info("File : '$it'.");
                 sourceFile

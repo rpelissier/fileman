@@ -10,14 +10,18 @@ import java.nio.file.Path
 @SpringBootTest
 @ActiveProfiles("test")
 @Disabled
-class DirectoryLoaderTest {
+class BinaryScannerTest {
 
     @Autowired
     lateinit var directoryLoader: DirectoryLoader
+
+    @Autowired
+    lateinit var binaryScanner: BinaryScanner
 
     @Test
     fun test() {
         val sourceDirPath = Path.of("/Users/renaud/Downloads")
         directoryLoader.load(sourceDirPath)
+        binaryScanner.scan(sourceDirPath)
     }
 }

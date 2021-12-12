@@ -44,4 +44,9 @@ class SourceFileService {
 
         return existingSourceFile
     }
+
+    @Transactional
+    fun findAll(sourceDir: SourceDir) : Sequence<SourceFile> {
+        return sourceFileRepository.findAll().asSequence()
+    }
 }
