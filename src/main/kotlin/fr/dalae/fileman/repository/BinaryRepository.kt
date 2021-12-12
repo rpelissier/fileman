@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BinaryRepository : CrudRepository<Binary, Long>{
+interface BinaryRepository : CrudRepository<Binary, String>{
 
     fun findByLastModifiedEpochMsAndSize(lastModifiedEpochMs: Long, size: Long) : List<Binary>
 }

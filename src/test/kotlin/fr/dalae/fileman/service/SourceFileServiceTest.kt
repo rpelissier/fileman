@@ -1,6 +1,6 @@
 package fr.dalae.fileman.service
 
-import fr.dalae.fileman.domain.BLOCK
+import fr.dalae.fileman.file.BLOCK
 import fr.dalae.fileman.domain.SourceFile
 import fr.dalae.fileman.file.FileNode
 import fr.dalae.fileman.file.NodeGenerator
@@ -21,14 +21,11 @@ class SourceFileServiceTest {
     lateinit var sourceDirService: SourceDirService
 
     @Autowired
-    lateinit var binaryService: BinaryService
-
-    @Autowired
     lateinit var sourceFileService: SourceFileService
 
 
     @Test
-    fun `should do`(){
+    fun `should persist files`(){
         val path = Path.of("file1.txt")
         val fileNode = FileNode(rootPath.resolve(path), "2015-02-20T06:30:00.000", 3.BLOCK())
         nodeGenerator.generateExact(fileNode)
@@ -39,13 +36,7 @@ class SourceFileServiceTest {
 
         var sourceDir = sourceDirService.merge(rootPath)
 
-        val document = binaryService.merge(SourceFile.create(sourceDir, path))
-        log.info(document.toString())
-
-        val document2 = binaryService.merge(SourceFile.create(sourceDir, path2))
-        log.info(document2.toString())
-
-        sourceFileService.merge(SourceFile.create(sourceDir, path))
-        sourceFileService.merge(SourceFile.create(sourceDir, path2))
+        sourceFileService.merge(sourceDir, path)
+        sourceFileService.merge(sourceDir, path2)
     }
 }

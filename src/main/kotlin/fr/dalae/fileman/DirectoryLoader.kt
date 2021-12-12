@@ -3,14 +3,14 @@ package fr.dalae.fileman
 import fr.dalae.fileman.file.FileUtils
 import fr.dalae.fileman.service.SourceDirService
 import fr.dalae.fileman.service.SourceFileService
-import java.nio.file.Path
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
-import javax.transaction.Transactional
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.nio.file.Path
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
+import javax.transaction.Transactional
 
 @Service
 class DirectoryLoader(config: ApplicationProperties) {
@@ -29,7 +29,7 @@ class DirectoryLoader(config: ApplicationProperties) {
     val storageDir = Path.of(config.storageDir)
         .apply { toFile().mkdirs() }
 
-    val batchSize = config.batchSize
+    final val batchSize = config.batchSize
     var observer = CountingObserver.loggingObserver(batchSize)
 
     @Transactional

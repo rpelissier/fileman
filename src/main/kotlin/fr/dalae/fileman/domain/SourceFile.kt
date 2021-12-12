@@ -9,7 +9,6 @@ import kotlin.io.path.extension
  * A pointer to a file within a source dir.
  */
 @Entity(name = "source_file")
-@SequenceGenerator(initialValue = 1, name = "generator", sequenceName = "sourceFileSeq")
 @Table(
     indexes = [
         Index(columnList = "lastModifiedEpochMs, size"),
@@ -29,13 +28,13 @@ class SourceFile(
     @Column(name="relative_path", columnDefinition = "varchar(512)")
     val relativePath: Path,
 
-    val lastModifiedEpochMs: Long,
+    var lastModifiedEpochMs: Long,
 
-    val size: Long,
+    var size: Long,
 
     val extension: String,
 
-) : DomainEntity() {
+    ) : DomainEntity() {
 
     companion object{
         fun create(sourceDir: SourceDir, relativePath: Path) : SourceFile{

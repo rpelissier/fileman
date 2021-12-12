@@ -4,7 +4,6 @@ import java.nio.file.Path
 import javax.persistence.*
 
 @Entity
-@SequenceGenerator(initialValue = 1, name = "generator", sequenceName = "sourceDirSeq")
 @Table(
     indexes = [
         Index(columnList = "path", unique = true)

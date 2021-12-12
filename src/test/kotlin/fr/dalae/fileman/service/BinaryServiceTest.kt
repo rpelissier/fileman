@@ -1,7 +1,6 @@
 package fr.dalae.fileman.service
 
-import fr.dalae.fileman.domain.BLOCK
-import fr.dalae.fileman.domain.SourceFile
+import fr.dalae.fileman.file.BLOCK
 import fr.dalae.fileman.file.FileNode
 import fr.dalae.fileman.file.NodeGenerator
 import org.junit.jupiter.api.Assertions
@@ -18,6 +17,9 @@ class BinaryServiceTest {
     lateinit var sourceDirService: SourceDirService
 
     @Autowired
+    lateinit var sourceFileService: SourceFileService
+
+    @Autowired
     lateinit var binaryService: BinaryService
 
 
@@ -26,7 +28,7 @@ class BinaryServiceTest {
     private val nodeGenerator = NodeGenerator()
 
     @Test
-    fun `Files with same size and date but different binary should lead to separated documents`() {
+    fun `Files with same size and date but different binary should lead to separated binaries`() {
         val path = Path.of("file1.txt")
         val fileNode = FileNode(rootPath.resolve(path), "2015-02-20T06:30:00.000", 3.BLOCK())
         nodeGenerator.generateExact(fileNode)
@@ -35,41 +37,43 @@ class BinaryServiceTest {
         val fileNode2 = FileNode(rootPath.resolve(path2), "2015-02-20T06:30:00.000", 3.BLOCK())
         nodeGenerator.generateExact(fileNode2)
 
-        var sourceDir = sourceDirService.merge(rootPath)
+        val sourceDir = sourceDirService.merge(rootPath)
 
-        val document = binaryService.merge(SourceFile.create(sourceDir, path))
-        log.info(document.toString())
-        Assertions.assertEquals(0, document.hashes.size)
+        val sourceFile = sourceFileService.merge(sourceDir, path)
+        val binary = binaryService.merge(sourceFile)
+        log.info(binary.toString())
+        Assertions.assertEquals(0, binary.hashes.size)
 
-        val document2 = binaryService.merge(SourceFile.create(sourceDir, path2))
-        log.info(document2.toString())
-        Assertions.assertEquals(1, document2.hashes.size)
+        val sourceFile2 = sourceFileService.merge(sourceDir, path2)
+        val binary2 = binaryService.merge(sourceFile2)
+        log.info(binary2.toString())
+        Assertions.assertEquals(1, binary2.hashes.size)
 
-        Assertions.assertEquals(document.lastModifiedEpochMs, document2.lastModifiedEpochMs)
-        Assertions.assertEquals(document.size, document2.size)
-        Assertions.assertNotEquals(document.id, document2.id)
+        Assertions.assertEquals(binary.lastModifiedEpochMs, binary2.lastModifiedEpochMs)
+        Assertions.assertEquals(binary.size, binary2.size)
+        Assertions.assertNotEquals(binary.id, binary2.id)
     }
 
     @Test
-    fun `Files with same size and date and same binary should lead to same documents`() {
-        val path = Path.of("file1.txt")
+    fun `Files with same size and date and same binary should lead to same binaries`() {
+        val path = Path.of("file3.txt")
         val fileNode = FileNode(rootPath.resolve(path), "2015-02-20T06:30:00.000", 5.BLOCK())
         val randomSeed = System.currentTimeMillis()
         nodeGenerator.generateExact(fileNode, randomSeed)
 
-        val path2 = Path.of("file2.txt")
+        val path2 = Path.of("file4.txt")
         val fileNode2 = FileNode(rootPath.resolve(path2), "2015-02-20T06:30:00.000", 5.BLOCK())
         nodeGenerator.generateExact(fileNode2, randomSeed)
 
-        var sourceDir = sourceDirService.merge(rootPath)
+        val sourceDir = sourceDirService.merge(rootPath)
+        val sourceFile = sourceFileService.merge(sourceDir, path)
+        var binary = binaryService.merge(sourceFile)
+        log.info(binary.toString())
 
-        var document = binaryService.merge(SourceFile.create(sourceDir, path))
-        log.info(document.toString())
+        val binary2 = binaryService.merge(sourceFile)
+        binary = binaryService.refresh(binary)
+        log.info(binary2.toString())
 
-        val document2 = binaryService.merge(SourceFile.create(sourceDir, path2))
-        document = binaryService.refresh(document)
-        log.info(document2.toString())
-
-        Assertions.assertEquals(document.id, document2.id)
+        Assertions.assertEquals(binary.id, binary2.id)
     }
 }

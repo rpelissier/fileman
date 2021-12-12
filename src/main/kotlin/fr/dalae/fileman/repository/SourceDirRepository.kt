@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 import java.nio.file.Path
 
 @Repository
-interface SourceDirRepository : CrudRepository<SourceDir, Long> {
+interface SourceDirRepository : CrudRepository<SourceDir, String> {
 
     @Query("select s from #{#entityName} s where s.path = ?1")
     fun findByPath(path: Path): SourceDir?

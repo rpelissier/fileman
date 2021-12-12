@@ -1,10 +1,13 @@
 package fr.dalae.fileman.service
 
+import fr.dalae.fileman.domain.SourceDir
 import fr.dalae.fileman.domain.SourceFile
 import fr.dalae.fileman.repository.SourceFileRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 
 @Service
@@ -19,20 +22,26 @@ class SourceFileService {
     lateinit var binaryService: BinaryService
 
     @OptIn(ExperimentalPathApi::class)
-    fun merge(sourceFile: SourceFile): SourceFile {
+    @Transactional
+    fun merge(sourceDir: SourceDir, relativePath: Path): SourceFile {
 
-        log.debug("Merging path '${sourceFile.relativePath}'")
+        log.debug("Merging path '${relativePath}'")
         val existingSourceFile =
-            sourceFileRepository.findBySourceDirAndRelativePath(sourceFile.sourceDir, sourceFile.relativePath)
+            sourceFileRepository.findBySourceDirAndRelativePath(sourceDir, relativePath)
 
-        if (existingSourceFile == null) {
-            return sourceFileRepository.save(sourceFile)
-        }else{
-            if (existingSourceFile.size != sourceFile.size || existingSourceFile.lastModifiedEpochMs != sourceFile.lastModifiedEpochMs) {
-                log.info("Changed size or date.")
-                //TODO Trigger something with binary service
-            }
-            return existingSourceFile
+        val currentSourceFile = SourceFile.create(sourceDir, relativePath)
+
+        if (existingSourceFile == null)
+            return sourceFileRepository.save(currentSourceFile)
+
+        val hasChanged = existingSourceFile.size != currentSourceFile.size
+                || existingSourceFile.lastModifiedEpochMs != currentSourceFile.lastModifiedEpochMs
+
+        if (hasChanged) {
+            existingSourceFile.size = currentSourceFile.size
+            existingSourceFile.lastModifiedEpochMs = currentSourceFile.lastModifiedEpochMs
         }
+
+        return existingSourceFile
     }
 }

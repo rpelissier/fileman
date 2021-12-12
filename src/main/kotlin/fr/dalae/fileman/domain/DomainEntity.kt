@@ -1,5 +1,6 @@
 package fr.dalae.fileman.domain
 
+import java.util.*
 import javax.persistence.*
 import javax.persistence.GenerationType
 
@@ -9,8 +10,7 @@ import javax.persistence.GeneratedValue
 abstract class DomainEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
-    val id : Long = -1
+    val id : String = UUID.randomUUID().toString()
 
     @Version
     protected var version: Long = -1
