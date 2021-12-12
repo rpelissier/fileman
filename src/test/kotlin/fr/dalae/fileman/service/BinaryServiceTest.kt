@@ -71,7 +71,6 @@ class BinaryServiceTest {
         log.info(binary.toString())
 
         val binary2 = binaryService.merge(sourceFile)
-        binary = binaryService.refresh(binary)
         log.info(binary2.toString())
 
         Assertions.assertEquals(binary.id, binary2.id)

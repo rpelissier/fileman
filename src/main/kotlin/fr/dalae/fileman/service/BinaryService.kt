@@ -39,11 +39,6 @@ class BinaryService(conf: ApplicationProperties) {
         return binary
     }
 
-    fun refresh(document: Binary): Binary {
-        return binaryRepository.findById(document.id).orElseThrow()
-    }
-
-
     /**
      * Compare docCandidate hash with every document that have the same date and size.
      * Hash only the beginning of the file that are enough to demonstrate the difference.

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
 
 @Service
 class SourceFileService {
@@ -21,7 +20,6 @@ class SourceFileService {
     @Autowired
     lateinit var binaryService: BinaryService
 
-    @OptIn(ExperimentalPathApi::class)
     @Transactional
     fun merge(sourceDir: SourceDir, relativePath: Path): SourceFile {
 
@@ -46,7 +44,7 @@ class SourceFileService {
     }
 
     @Transactional
-    fun findAll(sourceDir: SourceDir) : Sequence<SourceFile> {
+    fun findAll(sourceDir: SourceDir): Sequence<SourceFile> {
         return sourceFileRepository.findAll().asSequence()
     }
 }

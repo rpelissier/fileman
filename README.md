@@ -1,29 +1,45 @@
 # Objectif
 
-Fileman a pour but d'aggréger de manière continue plusieurs répertoires de données.
-Ces données sont indexées, dé-dupliquées et exposées à des tiers services qui pourront à leur tour les exploiter.
-Les répertoires source peuvent être modifiés et les évolutions seronts prises en compte de manière incrémentale.
+Fileman permet d'indexer, explorer et manipuler des répertoires contenant de nombreux fichiers.
 
-Le répertoire source n'est pas modifié et peut rester "vivant", par exemple en subissant des 
-updates par rsync de manière incrémentale.
+# Lots
 
-## Lot INDEX DIRECTORY
+## Lot File Index (100%)
 - Scanner un répertoire
-- L'indexer en BDD
-  - convertir les noeuds des paths en tags
-  - se souvenir du mapping avec le(s) documents d'origine
-  - merging par clé [name + date + size]
+- Indexer les fichiers en BDD
+  - par taille
+  - par date
+  - par path
+  - par extension
 
-## Lot HARDLINK DB
-- Hardlink des fichiers dans le stockage de référence local
-  
-## Lot INDEX FILTER
-- Filtrer les fichiers importés 
-  - Par extension
-  - Par path
-  - Par directory-contains(file pattern) (pour filter les BDD de code)
+## Lot Binary Index (100%)
+- Scanner le contenu binaire des fichiers pour trouver les duplicates.
 
-OPT : rapport json de tous les fichiers / répertoire filtrés
+## Lot UI : Application canvas
+- React TS front setup
+
+## Lot UI : Reports
+- Rapport sommaire (nb de fichiers, total size...)
+- Tree map par size
+  - https://www.highcharts.com/demo/treemap-large-dataset
+
+## Lot Indexing Filters
+Il faut pouvoir ignorer des sous répertoires au moment du scan.
+Ex :
+- fichiers systèmes
+- fichiers binaires compilés
+
+Il faut mettre en place des filtres.
+Au niveau fichier:
+- Par extension de fichier
+- Par path/name regex de fichier
+Au niveau subdir crawling
+- Ne pas explorer le dir s'il contient un fichier xxx (pour filter les BDD de code)
+
+Prévoir un rapport json pour savoir ce qui a été ignoré.
+
+S'inspirer de .gitignore
+
 
 ## Lot SEARCH
 
@@ -35,7 +51,7 @@ OPT : rapport json de tous les fichiers / répertoire filtrés
 
 - Rapport json de tous les fichiers dupliqués
 
-## Lot 3
+## Pour plus tard
 Features
 - supprimer les doublons
     - basés sur lastModified + size
