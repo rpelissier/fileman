@@ -2,6 +2,7 @@ package fr.dalae.fileman.service
 
 import fr.dalae.fileman.domain.SourceDir
 import fr.dalae.fileman.domain.SourceFile
+import fr.dalae.fileman.repository.SourceDirRepository
 import fr.dalae.fileman.repository.SourceFileRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +17,9 @@ class SourceFileService {
 
     @Autowired
     lateinit var sourceFileRepository: SourceFileRepository
+
+    @Autowired
+    lateinit var sourceDirRepository: SourceDirRepository
 
     @Autowired
     lateinit var binaryService: BinaryService
@@ -44,8 +48,14 @@ class SourceFileService {
     }
 
     @Transactional
-    fun findAll(sourceDir: SourceDir): Sequence<SourceFile> {
-        return sourceFileRepository.findAll().asSequence()
+    fun findAll(sourceDir: SourceDir): List<SourceFile> {
+        return sourceFileRepository.findAll().toList()
+    }
+
+    @Transactional
+    fun findAll(sourceDirPath: String): List<SourceFile> {
+        val sourceDir = sourceDirRepository.findByPath(Path.of(sourceDirPath))?:return emptyList()
+        return sourceFileRepository.findAllBySourceDir(sourceDir)
     }
 
     @Transactional

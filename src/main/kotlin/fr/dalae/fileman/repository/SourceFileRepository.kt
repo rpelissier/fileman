@@ -13,4 +13,6 @@ interface SourceFileRepository : CrudRepository<SourceFile, String>{
     fun findBySourceDirAndRelativePath(sourceDir: SourceDir, relativePath: Path) : SourceFile?
 
     fun countAllBySourceDir(sourceDir: SourceDir): Int
+
+    fun findAllBySourceDir(sourceDir: SourceDir): List<SourceFile>
 }

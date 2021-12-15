@@ -1,6 +1,8 @@
 const http = require('http');
 const querystring = require('querystring');
 
+const desktopDir = '/Users/renaud/Desktop'
+
 function loadDir(path) {
     const parameters = { path: path }
 
@@ -53,4 +55,32 @@ function listDirs() {
     req.end();
 }
 
-listDirs()
+function listDirFiles(path) {
+    const parameters = { path: path }
+
+    const get_request_args = querystring.stringify(parameters);
+
+    var options = {
+        host: 'localhost',
+        port: 8080,
+        path: '/directory/files?' + get_request_args,
+        method: 'GET'
+    };
+
+    var req = http.request(options, function (res) {
+        console.log('STATUS: ' + res.statusCode);
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('BODY: ' + chunk);
+        });
+    });
+
+    req.on('error', function (e) {
+        console.log('problem with request: ' + e.message);
+    });
+
+    req.end();
+}
+
+listDirFiles(desktopDir)

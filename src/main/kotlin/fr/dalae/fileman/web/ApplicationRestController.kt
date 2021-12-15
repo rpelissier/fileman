@@ -28,13 +28,20 @@ class ApplicationRestController {
 
     @GetMapping("/directories")
     fun getDirectories(): List<SourceDir> {
+        log.info("GET directories")
         return sourceDirService.list()
     }
 
     @PutMapping("/directory")
     fun putDirectory(@Param("path") path: String): String {
-        log.info("PUT path '$path'")
+        log.info("PUT directory '$path'")
         val sourceDir = directoryLoader.load(Path.of(path))
         return sourceFileService.countAll(sourceDir).toString()
+    }
+
+    @GetMapping("/directory/files")
+    fun getDirectoryFiles(@Param("path") path: String): List<String> {
+        log.info("GET directory files '$path'")
+        return sourceFileService.findAll(path).map { it.relativePath.toString() }
     }
 }
