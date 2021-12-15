@@ -47,4 +47,9 @@ class SourceFileService {
     fun findAll(sourceDir: SourceDir): Sequence<SourceFile> {
         return sourceFileRepository.findAll().asSequence()
     }
+
+    @Transactional
+    fun countAll(sourceDir: SourceDir): Int {
+        return sourceFileRepository.countAllBySourceDir(sourceDir)
+    }
 }

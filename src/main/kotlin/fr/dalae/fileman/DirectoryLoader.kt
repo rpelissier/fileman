@@ -1,5 +1,6 @@
 package fr.dalae.fileman
 
+import fr.dalae.fileman.domain.SourceDir
 import fr.dalae.fileman.file.FileUtils
 import fr.dalae.fileman.service.SourceDirService
 import fr.dalae.fileman.service.SourceFileService
@@ -30,8 +31,9 @@ class DirectoryLoader(config: ApplicationProperties) {
     var observer = CountingObserver.loggingObserver(batchSize)
 
     @Transactional
-    fun load(sourceDirPath: Path) {
+    fun load(sourceDirPath: Path) : SourceDir {
         val sourceDir = sourceDirService.merge(sourceDirPath)
+        log.info("Loading path '${sourceDir.path}'.")
         val pathSequence = FileUtils.fileWalkingSequence(sourceDir.path)
         pathSequence
             .map {
@@ -46,5 +48,6 @@ class DirectoryLoader(config: ApplicationProperties) {
                 entityManager.clear()
             }
         observer.notifyDone()
+        return sourceDir
     }
 }

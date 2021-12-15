@@ -21,6 +21,11 @@ class SourceDirService {
     }
 
     @Transactional
+    fun list(): List<SourceDir> {
+        return sourceDirRepository.findAll().filterNotNull()
+    }
+
+    @Transactional
     fun find(sourceDirPath: Path): SourceDir {
         return sourceDirRepository
             .findByPath(sourceDirPath)?:throw Exception("SourceDir $sourceDirPath not found.")
