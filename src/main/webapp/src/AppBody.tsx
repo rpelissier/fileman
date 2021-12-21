@@ -1,7 +1,6 @@
 import React from "react";
 import { Grid } from "@mui/material"
 import Paper from '@mui/material/Paper';
-import Chart from './intents/IntentChart';
 import Deposits from './intents/IntentDeposits';
 import IntentIndex from "./intents/IntentIndex";
 import Orders from './intents/IntentOrders';
@@ -14,12 +13,6 @@ export default function AppBody() {
             <Grid item xs={12} md={8} lg={6}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
                     <IntentIndex />
-                </Paper>
-            </Grid>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
-                    <Chart />
                 </Paper>
             </Grid>
             {/* Recent Deposits */}

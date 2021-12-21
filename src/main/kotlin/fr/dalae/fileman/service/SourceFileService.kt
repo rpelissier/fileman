@@ -1,7 +1,8 @@
 package fr.dalae.fileman.service
 
-import fr.dalae.fileman.domain.SourceDir
-import fr.dalae.fileman.domain.SourceFile
+import fr.dalae.fileman.domain.SourceFilesSummary
+import fr.dalae.fileman.domain.entity.SourceDir
+import fr.dalae.fileman.domain.entity.SourceFile
 import fr.dalae.fileman.repository.SourceDirRepository
 import fr.dalae.fileman.repository.SourceFileRepository
 import org.slf4j.LoggerFactory
@@ -61,5 +62,12 @@ class SourceFileService {
     @Transactional
     fun countAll(sourceDir: SourceDir): Int {
         return sourceFileRepository.countAllBySourceDir(sourceDir)
+    }
+
+    @Transactional
+    fun summarize(sourceDirPath: String): SourceFilesSummary {
+        val sourceDir = sourceDirRepository.findByPath(Path.of(sourceDirPath))?:return SourceFilesSummary()
+        val countAndSum = sourceFileRepository.getCountAndSumSize(sourceDir)[0]
+        return SourceFilesSummary(countAndSum[0].toInt(), countAndSum[1].toLong())
     }
 }

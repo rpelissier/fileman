@@ -1,8 +1,8 @@
 package fr.dalae.fileman.repository
 
-import fr.dalae.fileman.domain.Binary
-import fr.dalae.fileman.domain.SourceDir
-import fr.dalae.fileman.domain.SourceFile
+import fr.dalae.fileman.domain.entity.Binary
+import fr.dalae.fileman.domain.entity.SourceDir
+import fr.dalae.fileman.domain.entity.SourceFile
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest

@@ -1,6 +1,6 @@
 package fr.dalae.fileman
 
-import fr.dalae.fileman.domain.SourceDir
+import fr.dalae.fileman.domain.entity.SourceDir
 import fr.dalae.fileman.file.FileUtils
 import fr.dalae.fileman.service.SourceDirService
 import fr.dalae.fileman.service.SourceFileService

@@ -1,4 +1,4 @@
-package fr.dalae.fileman.domain
+package fr.dalae.fileman.domain.entity
 
 import java.nio.file.Path
 import javax.persistence.AttributeConverter

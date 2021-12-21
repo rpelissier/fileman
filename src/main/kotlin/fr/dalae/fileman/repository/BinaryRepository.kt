@@ -1,6 +1,6 @@
 package fr.dalae.fileman.repository
 
-import fr.dalae.fileman.domain.Binary
+import fr.dalae.fileman.domain.entity.Binary
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 

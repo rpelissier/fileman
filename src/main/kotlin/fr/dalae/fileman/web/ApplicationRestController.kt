@@ -1,7 +1,8 @@
 package fr.dalae.fileman.web
 
 import fr.dalae.fileman.DirectoryLoader
-import fr.dalae.fileman.domain.SourceDir
+import fr.dalae.fileman.domain.SourceFilesSummary
+import fr.dalae.fileman.domain.entity.SourceDir
 import fr.dalae.fileman.service.SourceDirService
 import fr.dalae.fileman.service.SourceFileService
 import org.slf4j.LoggerFactory
@@ -43,5 +44,11 @@ class ApplicationRestController {
     fun getDirectoryFiles(@Param("path") path: String): List<String> {
         log.info("GET directory files '$path'")
         return sourceFileService.findAll(path).map { it.relativePath.toString() }
+    }
+
+    @GetMapping("/directory/summary")
+    fun getDirectorySummary(@Param("path") path: String): SourceFilesSummary {
+        log.info("GET directory files '$path'")
+        return sourceFileService.summarize(path)
     }
 }

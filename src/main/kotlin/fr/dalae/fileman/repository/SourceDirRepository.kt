@@ -1,6 +1,6 @@
 package fr.dalae.fileman.repository
 
-import fr.dalae.fileman.domain.SourceDir
+import fr.dalae.fileman.domain.entity.SourceDir
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository

@@ -1,9 +1,8 @@
-package fr.dalae.fileman.domain
+package fr.dalae.fileman.domain.entity
 
 import java.io.File
 import java.nio.file.Path
 import javax.persistence.*
-import kotlin.io.path.extension
 
 /**
  * A pointer to a file within a source dir.
@@ -37,7 +36,7 @@ class SourceFile(
     ) : DomainEntity() {
 
     companion object{
-        fun create(sourceDir: SourceDir, relativePath: Path) : SourceFile{
+        fun create(sourceDir: SourceDir, relativePath: Path) : SourceFile {
             val file = sourceDir.path.resolve(relativePath).toFile()
             val lastModified = file.lastModified()
             val size = file.length()

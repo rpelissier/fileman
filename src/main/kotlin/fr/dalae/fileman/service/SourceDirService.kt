@@ -1,6 +1,6 @@
 package fr.dalae.fileman.service
 
-import fr.dalae.fileman.domain.SourceDir
+import fr.dalae.fileman.domain.entity.SourceDir
 import fr.dalae.fileman.repository.SourceDirRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

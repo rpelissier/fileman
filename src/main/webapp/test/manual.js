@@ -83,4 +83,6 @@ function listDirFiles(path) {
     req.end();
 }
 
-listDirFiles(desktopDir)
+loadDir(desktopDir);
+listDirs(desktopDir);
+listDirFiles(desktopDir);

@@ -1,8 +1,8 @@
 package fr.dalae.fileman.service
 
 import fr.dalae.fileman.ApplicationProperties
-import fr.dalae.fileman.domain.Binary
-import fr.dalae.fileman.domain.SourceFile
+import fr.dalae.fileman.domain.entity.Binary
+import fr.dalae.fileman.domain.entity.SourceFile
 import fr.dalae.fileman.file.HashUtils
 import fr.dalae.fileman.repository.BinaryRepository
 import fr.dalae.fileman.repository.SourceFileRepository
