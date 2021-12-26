@@ -1,19 +1,16 @@
-const url = 'http://localhost:8080'
+const url = "http://localhost:8080";
 
 export async function loadDir(path: string): Promise<string> {
-
-  const requestBody = {
-    path: path,
-  };
-
   return new Promise<string>(async function (resolve, reject) {
-    const res = await fetch(`${url}/directory`, {
-      method: "post",
+    const fullUrl = new URL(`${url}/directory`);
+    fullUrl.searchParams.set("path", path);
+
+    const res = await fetch(fullUrl.toString(), {
+      method: "put",
       headers: {
         "Content-Type": "application/json",
         "x-access-token": "token-value",
       },
-      body: JSON.stringify(requestBody),
     });
 
     if (!res.ok) {
@@ -29,8 +26,6 @@ export async function loadDir(path: string): Promise<string> {
 }
 
 export async function listDirs(): Promise<string[]> {
-
-
   return new Promise<string[]>(async function (resolve, reject) {
     const res = await fetch(`${url}/directories`, {
       method: "get",
