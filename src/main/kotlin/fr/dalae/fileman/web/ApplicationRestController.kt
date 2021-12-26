@@ -8,12 +8,14 @@ import fr.dalae.fileman.service.SourceFileService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.query.Param
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RestController
 import java.nio.file.Path
 
 @RestController
+@CrossOrigin(origins = ["http://localhost:3000"], maxAge = 3600)
 class ApplicationRestController {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -28,9 +30,9 @@ class ApplicationRestController {
     private lateinit var directoryLoader: DirectoryLoader
 
     @GetMapping("/directories")
-    fun getDirectories(): List<SourceDir> {
+    fun getDirectories(): List<String> {
         log.info("GET directories")
-        return sourceDirService.list()
+        return sourceDirService.list().map { it.path.toString() }
     }
 
     @PutMapping("/directory")
